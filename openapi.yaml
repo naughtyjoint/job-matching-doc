@@ -4,8 +4,8 @@ info:
   version: 1.0.0
 tags:
   - name: 會員
-  - name: 工作
-  - name: 招募
+  # - name: 工作
+  # - name: 招募
 paths:
   "/v1/user/info/{user_id}":
     get:
@@ -14,12 +14,38 @@ paths:
       summary: 取得會員資訊
       operationId: getUserInfo
       parameters:
-        - name: user_id
-          in: path
-          required: true
-          description: 會員ID
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 會員編號
+                          - $ref: '#/components/schemas/User'
+  /v1/user/create:
+    post:
+      tags:
+        - 會員
+      summary: 新增會員
+      operationId: addUser
+      requestBody:
+        description: 會員資訊
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
       responses:
         '200':
           description: successful operation
@@ -32,9 +58,97 @@ paths:
                     properties:
                       res:
                         type: object
-                        properties:
-                          yoyo:
-                            type: string
+                        allOf:
+                          - $ref: '#/components/schemas/User'
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 會員編號
+  /v1/user/update:
+    post:
+      tags:
+        - 會員
+      summary: 更新會員資訊
+      operationId: updateUser
+      requestBody:
+        description: 會員資訊
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                - $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        allOf:
+                          - $ref: '#/components/schemas/User'
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 會員編號
+  /v1/user/{user_id}:
+    delete:
+      tags:
+        - 會員
+      summary: 刪除會員
+      operationId: deleteUser
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: boolean
+  /v1/user/profile/{user_id}:
+    get:
+      tags:
+        - 會員
+      summary: 取得會員詳細資料
+      operationId: getUserProfile
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                description: 會員編號
+                          - $ref: '#/components/schemas/UserProfile'
+
 components:
   parameters:
     pageParam:
@@ -52,7 +166,7 @@ components:
     userIdParam:
       name: user_id
       in: path
-      description: 使用者id
+      description: 會員id
       required: true
       schema:
         type: integer
@@ -67,3 +181,149 @@ components:
       required:
         - msg
         - res
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 姓名
+        en_name:
+          type: string
+          description: 英文名
+        sex:
+          type: integer
+          description: 性別(0:女 1:男)
+          enum: [0, 1]
+        birthday:
+          type: string
+          format: date
+          description: 生日
+        marital_status:
+          type: integer
+          description: 婚姻狀態
+        phone:
+          type: object
+          description: 電話號碼
+          properties:
+            phoen_1:
+              type: string
+            phoen_2:
+              type: string
+            phoen_3:
+              type: string
+        special_id:
+          type: integer
+          description: 特殊身分
+        email:
+          type: string
+          format: email
+          description: 信箱
+        email_verified_at:
+          type: string
+          description: 信箱認證時間
+        contact_time:
+          type: object
+          description: 聯絡時間
+        education:
+          type: object
+          description: 教育背景
+        skills:
+          type: object
+          description: 技能
+        mug_shot_img:
+          type: string
+          description: 大頭貼
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+            dist:
+              type: string
+          description: 所在地區
+        address:
+          type: string
+          description: 地址
+        public_info:
+          type: object
+          description: 公開資訊
+        public_contact_info:
+          type: object
+          description: 公開聯絡資訊
+        privacy_setting:
+          type: object
+          properties:
+            job_match:
+              type: boolean
+            match_inform:
+              type: boolean
+            public_profile:
+              type: boolean
+          description: 隱私設定資訊
+        last_login:
+          type: string
+          format: date-time
+          description: 最後登入時間
+      required:
+        - id
+        - name
+        - en_name
+        - sex
+        - birthday
+        - marital_status
+        - phone
+        - special_id
+        - email
+        - email_verified_at
+        - contact_time
+        - education
+        - skills
+        - mug_shot_img
+        - location
+        - address
+        - public_info
+        - public_contact_info
+        - privacy_setting
+        - last_login
+    UserProfile:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        statue:
+          type: integer
+        vehicles:
+          type: array
+          items:
+            type: string
+        experiences:
+          type: object
+        education:
+          type: array
+        lang_skill:
+          type: array
+          items:
+            type: object
+        certificates:
+          type: array
+          items:
+            type: object
+        it_skills:
+          type: array
+          items:
+            type: object
+        bio:
+          type: string
+        bio_en:
+          type: string
+      required:
+        - user_id
+        - statue
+        - vehicles
+        - experiences
+        - education
+        - lang_skill
+        - certificates
+        - it_skills
+        - bio
+        - bio_en
