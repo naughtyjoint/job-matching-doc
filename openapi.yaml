@@ -1,0 +1,69 @@
+openapi: 3.0.1
+info:
+  title: 工作媒合平台
+  version: 1.0.0
+tags:
+  - name: 會員
+  - name: 工作
+  - name: 招募
+paths:
+  "/v1/user/info/{user_id}":
+    get:
+      tags:
+        - 會員
+      summary: 取得會員資訊
+      operationId: getUserInfo
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: 會員ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          yoyo:
+                            type: string
+components:
+  parameters:
+    pageParam:
+      name: page
+      in: query
+      description: 頁數(預設為1)
+      schema:
+        type: integer
+    limitParam:
+      name: limit
+      in: query
+      description: 單頁筆數(預設為24)
+      schema:
+        type: integer
+    userIdParam:
+      name: user_id
+      in: path
+      description: 使用者id
+      required: true
+      schema:
+        type: integer
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+        res:
+          type: object
+      required:
+        - msg
+        - res
