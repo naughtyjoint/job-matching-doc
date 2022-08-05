@@ -6,6 +6,7 @@ tags:
   - name: 會員
   - name: 工作
   - name: 招募
+  - name: 任務
 paths:
   #user
   /v1/user/info/{user_id}:
@@ -467,6 +468,199 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/Recruitment'
+  /v1/recruitment/interview:
+    post:
+      tags:
+        - 招募
+      summary: 發請面試邀請
+      description: 由業主向求職者發請面試邀請
+      operationId: createInterview
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterviewReqBody'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+
+  #任務
+  /v1/task/create:
+    post:
+      tags:
+        - 任務
+      summary: 排定工作任務
+      description: 排定工作任務
+      operationId: createTask
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_id:
+                  type: integer
+                user_id:
+                  type: integer
+                wage:
+                  type: integer
+                start_date:
+                  type: string
+                end_date:
+                  type: string
+                memo:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+  /v1/task/update:
+    post:
+      tags:
+        - 任務
+      summary: 更新工作任務內容
+      description: 更新工作任務內容
+      operationId: updateTask
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_id:
+                  type: integer
+                user_id:
+                  type: integer
+                wage:
+                  type: integer
+                start_date:
+                  type: string
+                end_date:
+                  type: string
+                memo:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+  /v1/task/user/{user_id}:
+    get:
+      tags:
+        - 任務
+      summary: 勞工查看任務列表
+      description: 勞工查看任務列表
+      operationId: getUserTask
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+  /v1/task/owner/{user_id}:
+    get:
+      tags:
+        - 任務
+      summary: 業主查看任務列表
+      description: 業主查看任務列表
+      operationId: getOwnerTask
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+  /v1/task/{task_id}/status/{status}:
+    get:
+      tags:
+        - 任務
+      summary: 更新任務狀態
+      description: |
+        更新任務狀態，狀態列表如下
+
+        (0: 尚未執行、1: 執行中、2: 執行結束、3: 已結算)
+      operationId: updateTaskStatus
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+  /v1/task/rate:
+    post:
+      tags:
+        - 任務
+      summary: 勞工評分任務
+      description: 勞工對指定任務評分，分數範圍為1至5
+      operationId: rateTask
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+  /v1/task/comment:
+    post:
+      tags:
+        - 任務
+      summary: 勞工評論任務
+      description: 勞工對指定任務發表評論
+      operationId: commentTask
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+  /v1/task/owner/rate:
+    post:
+      tags:
+        - 任務
+      summary: 業主評分任務
+      description: 業主對指定任務評分，分數範圍為1至5
+      operationId: ownerRateTask
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+  /v1/task/owner/comment:
+    post:
+      tags:
+        - 任務
+      summary: 業主評論任務
+      description: 業主對完成指定任務之勞工發表評論
+      operationId: ownerCommentTask
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
 
 components:
   parameters:
@@ -900,6 +1094,26 @@ components:
       required:
         - job_id
         - candidate_id
+    InterviewReqBody:
+      type: object
+      properties:
+        recruitment_id:
+          type: integer
+          description: 招募編號
+        interview_time:
+          type: string
+          description: 面試時間
+        address:
+          type: string
+          description: 面試地點
+        description:
+          type: string
+          description: 面試說明
+      required:
+        - recruitment_id
+        - interview_time
+        - address
+        - description
     ResWitNull:
       allOf:
         - $ref: '#/components/schemas/ApiResponse'
