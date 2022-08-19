@@ -2,6 +2,8 @@ openapi: 3.0.1
 info:
   title: 工作媒合平台
   version: 1.0.0
+servers:
+- url: https://job-matching-test.herokuapp.com
 tags:
   - name: 會員
   - name: 工作
