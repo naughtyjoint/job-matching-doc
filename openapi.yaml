@@ -9,6 +9,7 @@ tags:
   - name: 工作
   - name: 招募
   - name: 任務
+  - name: 申訴
 paths:
   #user
   /v1/user/info/{user_id}:
@@ -663,6 +664,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+  
+  #complaint
+  /v1/complaint/create:
+    post:
+      tags:
+        - 申訴
+      summary: 新增申訴事件
+      operationId: createComplaint
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                task_id:
+                  type: integer
+                content:
+                  type: string
+                img:
+                  type: string
+                  format: binary
+                video:
+                  type: string
+                  format: binary
+                audio:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+
 
 components:
   parameters:
