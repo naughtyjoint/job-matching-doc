@@ -3,7 +3,7 @@ info:
   title: 工作媒合平台
   version: 1.0.0
 servers:
-- url: http://139.162.73.241/
+- url: https://yxpk4.com/
 tags:
   - name: 會員
   - name: 工作
