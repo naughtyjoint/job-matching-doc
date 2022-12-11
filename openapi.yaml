@@ -3,7 +3,7 @@ info:
   title: 工作媒合平台
   version: 1.0.0
 servers:
-- url: https://job-matching-test.herokuapp.com
+- url: http://139.162.73.241/
 tags:
   - name: 會員
   - name: 工作
@@ -12,14 +12,26 @@ tags:
   - name: 申訴
 paths:
   #user
-  /v1/user/info/{user_id}:
-    get:
+  /v1/user/login:
+    post:
       tags:
         - 會員
-      summary: 取得會員資訊
-      operationId: getUserInfo
-      parameters:
-        - $ref: '#/components/parameters/userIdParam'
+      summary: 會員登入
+      description: 會員登入輸入帳號密碼取得token
+      operationId: userLogin
+      requestBody:
+        description: 登入資訊
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
       responses:
         '200':
           description: successful operation
@@ -31,13 +43,29 @@ paths:
                   - type: object
                     properties:
                       res:
-                        allOf:
-                          - type: object
-                            properties:
-                              id:
-                                type: integer
-                                description: 會員編號
-                          - $ref: '#/components/schemas/User'
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                        required:
+                          - token
+        401:
+          description: 登入失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: login failed
+                  res:
+                    type: object
+                    nullable: true
+                    example: null
+                required:
+                  - msg
+                  - res
   /v1/user/create:
     post:
       tags:
@@ -70,6 +98,38 @@ paths:
                               id:
                                 type: integer
                                 description: 會員編號
+  /v1/user/info:
+    get:
+      tags:
+        - 會員
+      summary: 取得會員資訊
+      operationId: getUserInfo
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 會員編號
+                          - $ref: '#/components/schemas/FullUser'
+        401:
+          description: token無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedRes'
+      security:
+        - api_key: []
   /v1/user/update:
     post:
       tags:
@@ -101,12 +161,20 @@ paths:
                       res:
                         type: object
                         allOf:
-                          - $ref: '#/components/schemas/User'
+                          - $ref: '#/components/schemas/FullUser'
                           - type: object
                             properties:
                               id:
                                 type: integer
                                 description: 會員編號
+        401:
+          description: token無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedRes'
+      security:
+        - api_key: []
   /v1/user/{user_id}:
     delete:
       tags:
@@ -127,14 +195,20 @@ paths:
                     properties:
                       res:
                         type: boolean
-  /v1/user/profile/{user_id}:
+        401:
+          description: token無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedRes'
+      security:
+        - api_key: []
+  /v1/user/profile:
     get:
       tags:
         - 會員
       summary: 取得會員詳細資料
       operationId: getUserProfile
-      parameters:
-        - $ref: '#/components/parameters/userIdParam'
       responses:
         '200':
           description: successful operation
@@ -153,7 +227,14 @@ paths:
                                 type: integer
                                 description: 會員編號
                           - $ref: '#/components/schemas/UserProfile'
-  /v1/user/profile:
+        401:
+          description: token無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedRes'
+      security:
+        - api_key: []
     post:
       tags:
         - 會員
@@ -188,6 +269,14 @@ paths:
                                 type: integer
                                 description: 會員編號
                           - $ref: '#/components/schemas/UserProfile'
+        401:
+          description: token無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedRes'
+      security:
+        - api_key: []
 
   #job
   /v1/job/info/{job_id}:
@@ -222,6 +311,8 @@ paths:
                             properties:
                               detail:
                                 $ref: '#/components/schemas/JobDetail'
+      security:
+        - api_key: []
   /v1/job/create:
     post:
       tags:
@@ -256,6 +347,8 @@ paths:
                                 description: 工作編號
                             required:
                               - id
+      security:
+        - api_key: []
   /v1/job/detail:
     post:
       tags:
@@ -290,6 +383,8 @@ paths:
                                 description: 工作編號
                             required:
                               - id
+      security:
+        - api_key: []
   /v1/job/recommend:
     get:
       tags:
@@ -323,6 +418,8 @@ paths:
                             required:
                               - id
                           - $ref: '#/components/schemas/Job'
+      security:
+        - api_key: []
   
   #recruitment
   /v1/job/recruit:
@@ -345,6 +442,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/job/apply:
     post:
       tags:
@@ -365,6 +464,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/recruitment/reject/{recruitment_id}:
     get:
       tags:
@@ -381,6 +482,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/recruitment/read/{recruitment_id}:
     get:
       tags:
@@ -397,6 +500,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/recruitment/list:
     get:
       tags:
@@ -425,6 +530,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/Recruitment'
+      security:
+        - api_key: []
   /v1/recruitment/invitation:
     get:
       tags:
@@ -448,6 +555,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/Recruitment'
+      security:
+        - api_key: []
   /v1/recruitment/application:
     get:
       tags:
@@ -471,6 +580,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/Recruitment'
+      security:
+        - api_key: []
   /v1/recruitment/interview:
     post:
       tags:
@@ -491,6 +602,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
 
   #任務
   /v1/task/create:
@@ -526,6 +639,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/task/update:
     post:
       tags:
@@ -559,6 +674,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/task/user/{user_id}:
     get:
       tags:
@@ -575,6 +692,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/task/owner/{user_id}:
     get:
       tags:
@@ -591,6 +710,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/task/{task_id}/status/{status}:
     get:
       tags:
@@ -608,6 +729,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/task/rate:
     post:
       tags:
@@ -622,6 +745,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/task/comment:
     post:
       tags:
@@ -636,6 +761,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/task/owner/rate:
     post:
       tags:
@@ -650,6 +777,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
+      security:
+        - api_key: []
   /v1/task/owner/comment:
     post:
       tags:
@@ -664,7 +793,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
-  
+      security:
+        - api_key: []
+
   #complaint
   /v1/complaint/create:
     post:
@@ -699,7 +830,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResWitNull'
-
+      security:
+        - api_key: []
 
 components:
   parameters:
@@ -756,6 +888,12 @@ components:
       required:
         - msg
         - res
+    UnauthenticatedRes:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Unauthenticated.
     User:
       type: object
       properties:
@@ -835,10 +973,6 @@ components:
             public_profile:
               type: boolean
           description: 隱私設定資訊
-        last_login:
-          type: string
-          format: date-time
-          description: 最後登入時間
       required:
         - id
         - name
@@ -859,7 +993,15 @@ components:
         - public_info
         - public_contact_info
         - privacy_setting
-        - last_login
+    FullUser:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            last_login:
+              type: string
+              format: date-time
+              description: 最後登入時間
     UserProfile:
       type: object
       properties:
@@ -1164,3 +1306,8 @@ components:
               example: null
               description: 成功則回傳null
         
+  securitySchemes:
+    api_key:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
