@@ -77,7 +77,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              allOf:
+                - $ref: '#/components/schemas/User'
+                - type: object
+                  properties:
+                    password:
+                      type: string
+                      format: password
+                      description: 登入密碼
+                  required:
+                    - password
         required: true
       responses:
         '200':
