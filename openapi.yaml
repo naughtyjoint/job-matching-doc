@@ -1030,6 +1030,8 @@ paths:
               example:
                 msg: chat room not found
                 res: null
+      security:
+        - api_key: []
     post:
       tags:
         - 訊息
@@ -1073,6 +1075,30 @@ paths:
                 res: null
       security:
         - api_key: []
+  /v1/chat/broadcasting/auth:
+    post:
+      tags:
+        - 訊息
+      summary: 驗證私人頻道訂閱權限
+      operationId: chatBroadcastAuth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                socket_id:
+                  type: string
+                channel_name:
+                  type: string
+              required:
+                - socket_id
+                - channel_name
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json: {}
 
 components:
   parameters:
