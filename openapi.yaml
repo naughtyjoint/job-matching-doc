@@ -11,6 +11,7 @@ tags:
   - name: 招募
   - name: 任務
   - name: 申訴
+  - name: 訊息
 paths:
   #user
   /v1/user/login:
@@ -34,7 +35,7 @@ paths:
                   type: string
                   format: password
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -139,11 +140,7 @@ paths:
                                 description: 會員編號
                           - $ref: '#/components/schemas/FullUser'
         401:
-          description: token無效
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedRes'
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/user/info/{user_id}:
@@ -173,11 +170,7 @@ paths:
                                 description: 會員編號
                           - $ref: '#/components/schemas/FullUser'
         401:
-          description: token無效
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedRes'
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/user/update:
@@ -199,7 +192,7 @@ paths:
                 - $ref: '#/components/schemas/User'
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -218,11 +211,7 @@ paths:
                                 type: integer
                                 description: 會員編號
         401:
-          description: token無效
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedRes'
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/user/{user_id}:
@@ -234,7 +223,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/userIdParam'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -246,11 +235,7 @@ paths:
                       res:
                         type: boolean
         401:
-          description: token無效
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedRes'
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/user/resumes:
@@ -260,7 +245,7 @@ paths:
       summary: 取得會員所有履歷列表
       operationId: getUserResumes
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -289,11 +274,7 @@ paths:
                         required:
                           - data
         401:
-          description: token無效
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedRes'
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/user/resume/{resume_id}:
@@ -303,7 +284,7 @@ paths:
       summary: 取得履歷內容資訊
       operationId: getUserResumeById
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -322,17 +303,13 @@ paths:
                           - $ref: '#/components/schemas/UserResume'
                           - $ref: '#/components/schemas/ModelTimestamp'
         401:
-          description: token無效
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedRes'
+          $ref: '#/components/responses/TokenUnauthenticated'
         403:
           description: 無操作權限
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
               example:
                 msg: permission denied
                 res: null
@@ -351,7 +328,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserResume'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -369,11 +346,7 @@ paths:
                                 description: 會員編號
                           - $ref: '#/components/schemas/UserResume'
         401:
-          description: token無效
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedRes'
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/user/resume/{resume_id}/update:
@@ -389,7 +362,7 @@ paths:
             schema:  
               $ref: '#/components/schemas/UserResume'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -407,17 +380,13 @@ paths:
                                 description: 會員編號
                           - $ref: '#/components/schemas/UserResume'
         401:
-          description: token無效
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedRes'
+          $ref: '#/components/responses/TokenUnauthenticated'
         403:
           description: 無操作權限
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
               example:
                 msg: permission denied
                 res: null
@@ -434,7 +403,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/jobIdParam'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -473,7 +442,7 @@ paths:
               $ref: '#/components/schemas/Job'
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -509,7 +478,7 @@ paths:
               $ref: '#/components/schemas/JobDetail'
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -545,7 +514,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -582,12 +551,12 @@ paths:
               $ref: '#/components/schemas/RecruitmentReqBody'
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/job/apply:
@@ -604,12 +573,12 @@ paths:
               $ref: '#/components/schemas/RecruitmentReqBody'
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/recruitment/reject/{recruitment_id}:
@@ -620,14 +589,14 @@ paths:
       description: 業主方或求職者方拒絕招募請求
       operationId: rejectRecruitment
       parameters:
-        - $ref: '#/components/parameters/RecruitmentParam'
+        - $ref: '#/components/parameters/recruitmentParam'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/recruitment/read/{recruitment_id}:
@@ -638,14 +607,14 @@ paths:
       description: 業主方或求職者方讀取招募請求
       operationId: readRecruitment
       parameters:
-        - $ref: '#/components/parameters/RecruitmentParam'
+        - $ref: '#/components/parameters/recruitmentParam'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/recruitment/list:
@@ -663,7 +632,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -688,7 +657,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/userIdQryParam'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -713,7 +682,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/userIdQryParam'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -742,16 +711,16 @@ paths:
               $ref: '#/components/schemas/InterviewReqBody'
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
 
-  #任務
+  #task
   /v1/task/create:
     post:
       tags:
@@ -779,12 +748,12 @@ paths:
                   type: string
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/task/update:
@@ -814,12 +783,12 @@ paths:
                   type: string
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/task/user/{user_id}:
@@ -832,12 +801,12 @@ paths:
       parameters:
         - $ref: '#/components/parameters/userIdParam'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/task/owner/{user_id}:
@@ -850,12 +819,12 @@ paths:
       parameters:
         - $ref: '#/components/parameters/userIdParam'
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/task/{task_id}/status/{status}:
@@ -869,12 +838,12 @@ paths:
         (0: 尚未執行、1: 執行中、2: 執行結束、3: 已結算)
       operationId: updateTaskStatus
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/task/rate:
@@ -885,12 +854,12 @@ paths:
       description: 勞工對指定任務評分，分數範圍為1至5
       operationId: rateTask
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/task/comment:
@@ -901,12 +870,12 @@ paths:
       description: 勞工對指定任務發表評論
       operationId: commentTask
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/task/owner/rate:
@@ -917,12 +886,12 @@ paths:
       description: 業主對指定任務評分，分數範圍為1至5
       operationId: ownerRateTask
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
   /v1/task/owner/comment:
@@ -933,12 +902,12 @@ paths:
       description: 業主對完成指定任務之勞工發表評論
       operationId: ownerCommentTask
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
       security:
         - api_key: []
 
@@ -970,12 +939,138 @@ paths:
                   format: binary
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResWitNull'
+                $ref: '#/components/schemas/ApiResponse'
+      security:
+        - api_key: []
+
+  #message
+  /v1/chat/message/room/{user_id}:
+    get:
+      tags:
+        - 訊息
+      summary: 取得訊息room id
+      operationId: getChatRoomId
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        nullable: false
+                        properties:
+                          data:
+                            type: integer
+                            description: 訊息room id
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關會員訊息room id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: chat room not found
+                res: null
+      security:
+        - api_key: []
+  /v1/chat/messages/{room_id}:
+    get:
+      tags:
+        - 訊息
+      summary: 取得訊息紀錄
+      operationId: getMessageRecordsByRoomId
+      parameters:
+        - $ref: '#/components/parameters/roomIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/ChatMessage'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                                
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到會員訊息room id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: chat room not found
+                res: null
+    post:
+      tags:
+        - 訊息
+      summary: 傳送訊息
+      operationId: postChatMessage
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+              required:
+                - message
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            $ref: '#/components/schemas/ChatMessage'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到會員
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: user not found
+                res: null
       security:
         - api_key: []
 
@@ -1014,13 +1109,28 @@ components:
       required: true
       schema:
         type: integer
-    RecruitmentParam:
+    recruitmentParam:
       name: recruitment_id
       in: path
       description: 招募物件id
       required: true
       schema:
         type: integer
+    roomIdParam:
+      name: room_id
+      in: path
+      description: 訊息room id
+      required: true
+      schema:
+        type: integer
+
+  responses:
+    TokenUnauthenticated:
+      description: token無效
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthenticatedRes'
 
   schemas:
     ApiResponse:
@@ -1031,6 +1141,7 @@ components:
           example: success
         res:
           type: object
+          nullable: true
       required:
         - msg
         - res
@@ -1509,16 +1620,31 @@ components:
         - interview_time
         - address
         - description
-    ResWitNull:
-      allOf:
-        - $ref: '#/components/schemas/ApiResponse'
-        - type: object
-          properties:
-            res:
-              type: object
-              nullable: true
-              example: null
-              description: 成功則回傳null
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 訊息Id
+        user_id:
+          type: integer
+          description: 發送者Id
+        event_type:
+          type: integer
+          description: 訊息類別(0：聊天訊息，1：案件(任務)，2：應徵職缺，3：邀約職缺，4：面試邀請，5：收取費用，6：系統文字訊息)
+        event_id:
+          type: integer
+          description: 對應物件Id
+        message:
+          type: string
+          description: 訊息內文
+          nullable: true
+      required:
+        - id
+        - user_id
+        - event_type
+        - event_id
+        - message
     InvalidRequest:
       type: object
       properties:
