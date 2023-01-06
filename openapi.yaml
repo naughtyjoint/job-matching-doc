@@ -89,7 +89,7 @@ paths:
                     - password
         required: true
       responses:
-        '200':
+        200:
           description: successful operation
           content:
             application/json:
@@ -107,6 +107,13 @@ paths:
                               id:
                                 type: integer
                                 description: 會員編號
+        422:
+          description: 欄位錯誤
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
+            
   /v1/user/info:
     get:
       tags:
@@ -212,12 +219,12 @@ paths:
                 $ref: '#/components/schemas/UnauthenticatedRes'
       security:
         - api_key: []
-  /v1/user/profile:
+  /v1/user/resumes:
     get:
       tags:
         - 會員
-      summary: 取得會員詳細資料
-      operationId: getUserProfile
+      summary: 取得會員所有履歷列表
+      operationId: getUserResumes
       responses:
         '200':
           description: successful operation
@@ -229,13 +236,24 @@ paths:
                   - type: object
                     properties:
                       res:
-                        allOf:
-                          - type: object
-                            properties:
-                              user_id:
-                                type: integer
-                                description: 會員編號
-                          - $ref: '#/components/schemas/UserProfile'
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: 履歷名稱
+                                id:
+                                  type: integer
+                                  description: 履歷id
+                              required:
+                                - name
+                                - id
+                        required:
+                          - data
         401:
           description: token無效
           content:
@@ -244,22 +262,12 @@ paths:
                 $ref: '#/components/schemas/UnauthenticatedRes'
       security:
         - api_key: []
-    post:
+  /v1/user/resume/{resume_id}:
+    get:
       tags:
         - 會員
-      summary: 設定會員詳細資料
-      operationId: setUserProfile
-      requestBody:
-        description: 會員詳細資料
-        content:
-          application/json:
-            schema:
-              allOf:
-                - type: object
-                  properties:
-                    user_id:
-                      type: integer
-                - $ref: '#/components/schemas/UserProfile'
+      summary: 取得履歷內容資訊
+      operationId: getUserResumeById
       responses:
         '200':
           description: successful operation
@@ -277,13 +285,108 @@ paths:
                               user_id:
                                 type: integer
                                 description: 會員編號
-                          - $ref: '#/components/schemas/UserProfile'
+                          - $ref: '#/components/schemas/UserResume'
+                          - $ref: '#/components/schemas/ModelTimestamp'
         401:
           description: token無效
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthenticatedRes'
+        403:
+          description: 無操作權限
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+              example:
+                msg: permission denied
+                res: null
+      security:
+        - api_key: []
+  /v1/user/resume/create:
+    post:
+      tags:
+        - 會員
+      summary: 新增會員履歷資料
+      operationId: createUserResume
+      requestBody:
+        description: 會員詳細資料
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserResume'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                description: 會員編號
+                          - $ref: '#/components/schemas/UserResume'
+        401:
+          description: token無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedRes'
+      security:
+        - api_key: []
+  /v1/user/resume/{resume_id}/update:
+    post:
+      tags:
+        - 會員
+      summary: 更新會員履歷資料
+      operationId: updateUserResume
+      requestBody:
+        description: 會員詳細資料
+        content:
+          application/json:
+            schema:  
+              $ref: '#/components/schemas/UserResume'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                description: 會員編號
+                          - $ref: '#/components/schemas/UserResume'
+        401:
+          description: token無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedRes'
+        403:
+          description: 無操作權限
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResWitNull'
+              example:
+                msg: permission denied
+                res: null
       security:
         - api_key: []
 
@@ -927,12 +1030,14 @@ components:
           type: object
           description: 電話號碼
           properties:
-            phoen_1:
+            phone_1:
               type: string
-            phoen_2:
+            phone_2:
               type: string
-            phoen_3:
+            phone_3:
               type: string
+          required:
+            - phone_1
         special_id:
           type: integer
           description: 特殊身分
@@ -947,11 +1052,12 @@ components:
           type: object
           description: 聯絡時間
         education:
-          type: object
-          description: 教育背景
+          $ref: '#/components/schemas/Education'
         skills:
-          type: object
+          type: array
           description: 技能
+          items:
+            type: string
         mug_shot_img:
           type: string
           description: 大頭貼
@@ -977,10 +1083,17 @@ components:
           properties:
             job_match:
               type: boolean
+              description: 是否公開自動配動
             match_inform:
               type: boolean
+              description: 是否開啟配對通知
             public_profile:
               type: boolean
+              description: 是否公開會員資料
+          required:
+            - job_match
+            - match_inform
+            - public_profile
           description: 隱私設定資訊
       required:
         - id
@@ -1011,25 +1124,21 @@ components:
               type: string
               format: date-time
               description: 最後登入時間
-    UserProfile:
+    UserResume:
       type: object
       properties:
-        user_id:
+        status:
           type: integer
-          description: 會員編號
-        statue:
-          type: integer
-          description: 狀態
-        vehicles:
-          type: array
-          description: 交通工具列表
-          items:
-            type: string
+          description: "狀態（0：關閉，1：開啟)"
         experiences:
-          type: object
+          type: array
+          items:
+            $ref: '#/components/schemas/Experience'
           description: 經歷
         education:
           type: array
+          items:
+            $ref: '#/components/schemas/Education'
           description: 學歷
         lang_skill:
           type: array
@@ -1041,28 +1150,90 @@ components:
           description: 證照列表
           items:
             $ref: '#/components/schemas/Certificate'
-        it_skills:
+        skills:
           type: array
-          description: IT技能列表
+          description: 技能
+          items:
+            type: string
+        attachments:
+          type: array
           items:
             type: object
-        bio:
-          type: string
-          description: 自傳
-        bio_en:
-          type: string
-          description: 英文自傳
+            properties:
+              name:
+                type: string
+                description: 名稱
+              path:
+                type: string
+                description: 路徑
+          description: 附件
       required:
-        - user_id
-        - statue
-        - vehicles
+        - status
         - experiences
         - education
         - lang_skill
         - certificates
-        - it_skills
-        - bio
-        - bio_en
+        - skills
+    Experience:
+      type: object
+      properties:
+        position:
+          type: string
+          description: 經歷職務名稱
+        company:
+          type: string
+          description: 經歷公司名稱
+        type:
+          type: integer
+          description: "經歷工作類別 (0: 全職, 1:兼職, 2:實習)"
+        title:
+          type: array
+          items:
+            type: string
+          description:  經歷工作職稱
+        management:
+          type: integer
+          description: "經歷管理責任 (0: 10人以下, 1: 10人以上, 2: 30人以上 3:50 人以上 4: 100人以上)"
+        tenure:
+          type: object
+          properties:
+            started_at:
+              type: string
+            ended_at:
+              type: string
+          description: 任期
+        content:
+          type: string
+          description: 經歷內容
+      required:
+        - position
+        - company
+        - type
+        - title
+        - management
+        - tenure
+        - content
+    Education:
+      type: object
+      description: 教育背景
+      properties:
+        school:
+          type: string
+          description: 學校名稱
+        status:
+          type: integer
+          description: 狀態 (0:畢業, 1:肄業, 2:就學中)
+        department:
+          type: string
+          description: 科系
+        degree:
+          type: integer
+          description: 學位 (0:高中職, 1:專科, 2:學士, 3:碩士, 4:博士)
+      required:
+        - school
+        - status
+        - department
+        - degree
     LangSkill:
       type: object
       properties:
@@ -1093,18 +1264,18 @@ components:
         code:
           type: integer
           description: 類別代號
-        category:
+        type:
           type: string
           nullable: true
-          description: 自訂類別
-        detail:
+          description: 證書類別
+        name:
           type: string
           nullable: true
-          description: 自訂項目
+          description: 證書名稱
       required:
         - code
-        - category
-        - detail
+        - type
+        - name
     Job:
       type: object
       properties:
@@ -1314,7 +1485,27 @@ components:
               nullable: true
               example: null
               description: 成功則回傳null
-        
+    InvalidRequest:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+      required:
+        - message
+        - errors
+    ModelTimestamp:
+      type: object
+      properties:
+        created_at:
+          type: string
+        updated_at:
+          type: string
+      required:
+        - created_at
+        - updated_at
+
   securitySchemes:
     api_key:
       type: http
