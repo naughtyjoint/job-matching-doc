@@ -113,16 +113,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvalidRequest'
-            
+                $ref: '#/components/schemas/InvalidRequest'     
   /v1/user/info:
     get:
       tags:
         - 會員
-      summary: 取得會員資訊
+      summary: 取得自身會員資訊
       operationId: getUserInfo
       responses:
-        '200':
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 會員編號
+                          - $ref: '#/components/schemas/FullUser'
+        401:
+          description: token無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedRes'
+      security:
+        - api_key: []
+  /v1/user/info/{user_id}:
+    get:
+      tags:
+        - 會員
+      summary: 透過會員id取得會員資訊
+      operationId: getUserInfoById
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        200:
           description: successful operation
           content:
             application/json:
