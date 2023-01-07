@@ -949,6 +949,50 @@ paths:
         - api_key: []
 
   #message
+  /v1/chat/message/rooms:
+    get:
+      tags:
+        - 訊息
+      summary: 取得訊息聊天室列表
+      operationId: getChatRoomList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        nullable: false
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  description: 聊天室id
+                                user_id:
+                                  type: integer
+                                  description: 對方user id
+                                updated_at:
+                                  type: string
+                                  description: 最後更新時間
+                              required:
+                                - id
+                                - user_id
+                                - updated_at
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
   /v1/chat/message/room/{user_id}:
     get:
       tags:
@@ -1032,6 +1076,7 @@ paths:
                 res: null
       security:
         - api_key: []
+  /v1/chat/messages/{user_id}:
     post:
       tags:
         - 訊息
@@ -1099,6 +1144,8 @@ paths:
           description: successful operation
           content:
             application/json: {}
+      security:
+        - api_key: []
 
 components:
   parameters:
