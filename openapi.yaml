@@ -184,12 +184,7 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - type: object
-                  properties:
-                    id:
-                      type: integer
-                - $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/User'
         required: true
       responses:
         200:
@@ -238,6 +233,8 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
+  
+  #resumes
   /v1/user/resumes:
     get:
       tags:
@@ -1082,15 +1079,26 @@ paths:
         - 訊息
       summary: 傳送訊息
       operationId: postChatMessage
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
               type: object
               properties:
+                user_id:
+                  type: integer
+                event_type:
+                  type: integer
+                event_id:
+                  type: integer
                 message:
                   type: string
               required:
+                - user_id
+                - event_type
+                - event_id
                 - message
       responses:
         200:
@@ -1263,12 +1271,10 @@ components:
           type: string
           format: email
           description: 信箱
-        email_verified_at:
-          type: string
-          description: 信箱認證時間
         contact_time:
           type: object
           description: 聯絡時間
+          nullable: true
         education:
           $ref: '#/components/schemas/Education'
         skills:
@@ -1323,8 +1329,6 @@ components:
         - phone
         - special_id
         - email
-        - email_verified_at
-        - contact_time
         - education
         - skills
         - mug_shot_img
