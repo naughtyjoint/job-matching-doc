@@ -280,6 +280,8 @@ paths:
         - 履歷
       summary: 取得履歷內容資訊
       operationId: getUserResumeById
+      parameters:
+        - $ref: '#/components/parameters/resumeIdParam'
       responses:
         200:
           description: successful operation
@@ -352,6 +354,8 @@ paths:
         - 履歷
       summary: 更新會員履歷資料
       operationId: updateUserResume
+      parameters:
+        - $ref: '#/components/parameters/resumeIdParam'
       requestBody:
         description: 會員詳細資料
         content:
@@ -1201,6 +1205,13 @@ components:
       name: room_id
       in: path
       description: 訊息room id
+      required: true
+      schema:
+        type: integer
+    resumeIdParam:
+      name: user_id
+      in: path
+      description: 會員id
       required: true
       schema:
         type: integer
