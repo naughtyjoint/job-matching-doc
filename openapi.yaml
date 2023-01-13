@@ -239,8 +239,49 @@ paths:
     get:
       tags:
         - 履歷
-      summary: 取得會員所有履歷列表
+      summary: 取得自己的所有履歷列表
       operationId: getUserResumes
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: 履歷名稱
+                                id:
+                                  type: integer
+                                  description: 履歷id
+                              required:
+                                - name
+                                - id
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/user/resumes/{user_id}:
+    get:
+      tags:
+        - 履歷
+      summary: 取得會員所有履歷列表
+      operationId: getUserResumesById
+      parameters:
+        - $ref: "#/components/parameters/userIdParam"
       responses:
         200:
           description: successful operation
@@ -420,13 +461,24 @@ paths:
                               id:
                                 type: integer
                                 description: 工作編號
+                              user_id:
+                                type: integer
+                                description: 業主編號
+                              corp_id:
+                                type: integer
+                                description: 公司編號
+                                nullable: true
                             required:
                               - id
+                              - user_id
+                              - corp_id
                           - $ref: '#/components/schemas/Job'
                           - type: object
                             properties:
                               detail:
                                 $ref: '#/components/schemas/JobDetail'
+                            required:
+                              - detail
       security:
         - api_key: []
   /v1/job/create:
@@ -465,12 +517,14 @@ paths:
                               - id
       security:
         - api_key: []
-  /v1/job/detail:
+  /v1/job/detail/{job_id}:
     post:
       tags:
         - 工作
       summary: 設定工作詳情
       operationId: setJobDetail
+      parameters:
+        - $ref: "#/components/parameters/jobIdParam"
       requestBody:
         description: 工作資訊
         content:
@@ -1360,6 +1414,9 @@ components:
     UserResume:
       type: object
       properties:
+        name:
+          type: string
+          description: 履歷名稱
         status:
           type: integer
           description: "狀態（0：關閉，1：開啟)"
@@ -1512,104 +1569,126 @@ components:
     Job:
       type: object
       properties:
-        owner_id:
+        status:
           type: integer
-          description: 業主編號
-        corp_id:
-          type: integer
-          description: 企業編號
-          nullable: true
+          description: 案件狀態
         name:
           type: string
           description: 案件名稱
-        special_id:
+        type:
           type: integer
-          description: 特殊身份編號
-          nullable: true
-        identity:
-          type: integer
-          description: 身份編號
+          description: "案件類型（0：全職, 1：兼職, 2：實習）"
         industry:
           type: array
           description: 產業列表
           items:
             type: integer
+        insurance:
+          type: boolean
+          description: 健保
         demand_amount:
           type: integer
           description: 需求人數
-        status:
-          type: integer
-          description: 案件狀態
-        location:
-          type: object
-          description: 案件所在地區
-          properties:
-            city:
-              type: string
-              description: 縣市
-            dist:
-              type: string
-              description: 區域
+        seniority:
+          type: string
+          description: 工作年資
         address:
           type: string
           description: 案件所在地址
+        working:
+          type: object
+          description: 工作時間
+          properties:
+            start_date:
+              type: string
+              description: 起始日期
+            start_time:
+              type: string
+              description: 結束日期
+            end_date:
+              type: string
+              description: 上班時間
+            end_time:
+              type: string
+              description: 下班時間
+        description:
+          type: string
+          description: 案件內容敘述
         wage:
           type: object
           description: 案件薪酬
           properties:
             type:
               type: integer
-              description: 薪酬種類
+              description: "薪酬種類（1：時薪，2：月薪）"
             amount:
-              type: integer
+              type: string
               description: 薪資
-        description:
-          type: string
-          description: 案件內容敘述
+          required:
+            - type
+            - amount
+        tags:
+          type: array
+          description: 標籤
+          items:
+            type: string
       required:
-        - owner_id
+        - user_id
         - corp_id
-        - name
-        - special_id
-        - identity
-        - industry
-        - demand_amount
         - status
-        - location
+        - name
+        - type
+        - industry
+        - insurance
+        - demand_amount
+        - seniority
         - address
-        - wage
+        - working
         - description
-        - detail
+        - wage
+        - tags
     JobDetail:
       type: object
       properties:
-        job_id:
-          type: integer
-          description: 案件編號
-        vehicles:
-          type: array
-          description: 需求交通工具列表
-          items:
-            type: string
         education:
           type: array
           description: 學歷需求
-          nullable: true
-        lang_skill:
-          type: array
-          description: 語言需求
           items:
-            $ref: '#/components/schemas/LangSkill'
+            type: object
+            properties:
+              department:
+                type: string
+                description: 科系
+              degree:
+                type: integer
+                description: 學位 (0:高中職, 1:專科, 2:學士, 3:碩士, 4:博士)
+            required:
+              - department
+              - degree
+          nullable: true
         certificates:
           type: array
           description: 證照需求
           items:
             $ref: '#/components/schemas/Certificate'
-        it_skills:
+        lang_skill:
           type: array
-          description: IT技能需求
+          description: 語言需求
           items:
-            type: object
+            $ref: '#/components/schemas/LangSkill'
+        environments:
+          type: object
+          description: 環境
+          properties:
+            name:
+              type: string
+              description: 環境名稱
+            path:
+              type: string
+              description: 檔案路徑
+          required:
+            - name
+            - path
         skills:
           type: array
           description: 技能需求
@@ -1619,13 +1698,10 @@ components:
           description: 其他需求
           type: string
       required:
-        - job_id
-        - vehicles
-        - experiences
         - education
-        - lang_skill
         - certificates
-        - it_skills
+        - lang_skill
+        - environments
         - skills
         - other_demand
     Recruitment:
