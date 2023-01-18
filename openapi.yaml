@@ -415,10 +415,17 @@ paths:
                         allOf:
                           - type: object
                             properties:
+                              id:
+                                type: integer
+                                description: 履歷編號
                               user_id:
                                 type: integer
                                 description: 會員編號
+                            required:
+                              - id
+                              - user_id
                           - $ref: '#/components/schemas/UserResume'
+                          - $ref: '#/components/schemas/ModelTimestamp'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
@@ -1452,9 +1459,9 @@ components:
       schema:
         type: integer
     resumeIdParam:
-      name: user_id
+      name: resume_id
       in: path
-      description: 會員id
+      description: 履歷id
       required: true
       schema:
         type: integer
@@ -1613,12 +1620,12 @@ components:
           items:
             $ref: '#/components/schemas/Experience'
           description: 經歷
-        education:
+        educations:
           type: array
           items:
             $ref: '#/components/schemas/Education'
           description: 學歷
-        lang_skill:
+        lang_skills:
           type: array
           description: 外語能力
           items:
