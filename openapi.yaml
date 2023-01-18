@@ -6,6 +6,7 @@ servers:
 - url: https://yxpk4.com/
 tags:
   - name: 會員
+  - name: 公司
   - name: 履歷
   - name: 工作
   - name: 招募
@@ -435,7 +436,162 @@ paths:
       security:
         - api_key: []
 
+  #company
+  /v1/company/info:
+    get:
+      tags:
+        - 公司
+      summary: 取得自身公司資訊
+      operationId: getUserCompanyInfo
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 公司編號
+                            required:
+                              - id
+                              - avatar
+                              - fax
+                              - website
+                              - contact_time
+                              - others
+                              - description
+                              - remark
+                          - $ref: '#/components/schemas/Company'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/company/update:
+    post:
+      tags:
+        - 公司
+      summary: 更新公司資訊
+      operationId: updateCompany
+      requestBody:
+        description: 公司資訊
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 公司編號
+                            required:
+                              - id
+                              - avatar
+                              - fax
+                              - website
+                              - contact_time
+                              - others
+                              - description
+                              - remark
+                          - $ref: '#/components/schemas/Company'
+                          
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+
   #job
+  /v1/jobs:
+    get:
+      tags:
+        - 工作
+      summary: 取得自己的所有工作資料
+      operationId: getOwnJobslist
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 工作案件編號
+                                  required:
+                                    - id
+                                - $ref: "#/components/schemas/Job"
+                        required:
+                          - data
+      security:
+        - api_key: []
+  /v1/jobs/{user_id}:
+    get:
+      tags:
+        - 工作
+      summary: 取得會員所有工作資料
+      operationId: getJobslistByUserId
+      parameters:
+        - $ref: "#/components/parameters/userIdParam"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 工作案件編號
+                                  required:
+                                    - id
+                                - $ref: "#/components/schemas/Job"
+                        required:
+                          - data
+      security:
+        - api_key: []
   /v1/job/info/{job_id}:
     get:
       tags:
@@ -1306,6 +1462,7 @@ components:
         en_name:
           type: string
           description: 英文名
+          nullable: true
         sex:
           type: integer
           description: 性別(0:女 1:男)
@@ -1316,7 +1473,7 @@ components:
           description: 生日
         marital_status:
           type: integer
-          description: 婚姻狀態
+          description: "婚姻狀態（0: 未婚 1: 已婚 2: 離婚 3: 喪偶）"
         phone:
           type: object
           description: 電話號碼
@@ -1350,14 +1507,6 @@ components:
         mug_shot_img:
           type: string
           description: 大頭貼
-        location:
-          type: object
-          properties:
-            city:
-              type: string
-            dist:
-              type: string
-          description: 所在地區
         address:
           type: string
           description: 地址
@@ -1379,15 +1528,22 @@ components:
             public_profile:
               type: boolean
               description: 是否公開會員資料
+            resumes:
+              type: boolean
+              description: 是否公開履歷資料
+            jobs:
+              type: boolean
+              description: 是否公開工作資料
           required:
             - job_match
             - match_inform
             - public_profile
+            - resumes
+            - jobs
           description: 隱私設定資訊
       required:
         - id
         - name
-        - en_name
         - sex
         - birthday
         - marital_status
@@ -1397,7 +1553,6 @@ components:
         - education
         - skills
         - mug_shot_img
-        - location
         - address
         - public_info
         - public_contact_info
@@ -1566,12 +1721,70 @@ components:
         - code
         - type
         - name
+    Company:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 公司名稱
+        avatar:
+          type: string
+          description: 公司頭像
+          nullable: true
+        industry:
+          type: string
+          description: 公司類型
+        contact:
+          type: string
+          description: 公司聯絡人
+        phone:
+          type: string
+          description: 公司聯絡電話
+        fax:
+          type: string
+          description: 公司傳真
+          nullable: true
+        email:
+          type: string
+          description: 公司電子信箱
+        address:
+          type: string
+          description: 公司地址
+        website:
+          type: string
+          description: 公司網站
+          nullable: true
+        contact_time:
+          type: string
+          description: 公司聯絡時段
+          nullable: true
+        others:
+          type: array
+          description: 公司標籤
+          nullable: true
+          items:
+            type: string
+        description:
+          type: string
+          description: 公司簡介
+          nullable: true
+        remark:
+          type: string
+          description: 公司備註
+          nullable: true
+      required:
+        - name
+        - industry
+        - contact
+        - phone
+        - email
+        - address
     Job:
       type: object
       properties:
         status:
           type: integer
-          description: 案件狀態
+          description: "案件狀態（0: 關閉, 1: 開啟）"
         name:
           type: string
           description: 案件名稱
