@@ -234,7 +234,40 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
-  
+  /v1/search/users:
+    get:
+      tags:
+        - 會員
+      summary: 取得所有會員資訊
+      operationId: getAllUserInfo
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 會員編號
+                                - $ref: '#/components/schemas/FullUser'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+
   #resumes
   /v1/user/resumes:
     get:
