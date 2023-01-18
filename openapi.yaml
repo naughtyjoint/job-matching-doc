@@ -379,14 +379,32 @@ paths:
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         403:
-          description: 無操作權限
+          $ref: '#/components/responses/PermissionDenied'
+      security:
+        - api_key: []
+    delete:
+      tags:
+        - 履歷
+      summary: 刪除履歷
+      operationId: deleteResume
+      parameters:
+        - $ref: '#/components/parameters/resumeIdParam'
+      responses:
+        200:
+          description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-              example:
-                msg: permission denied
-                res: null
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: boolean
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        403:
+          $ref: '#/components/responses/PermissionDenied'
       security:
         - api_key: []
   /v1/user/resume/create:
@@ -465,14 +483,7 @@ paths:
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         403:
-          description: 無操作權限
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-              example:
-                msg: permission denied
-                res: null
+          $ref: '#/components/responses/PermissionDenied'
       security:
         - api_key: []
 
@@ -1473,6 +1484,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/UnauthenticatedRes'
+    PermissionDenied:
+      description: 無操作權限
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+          example:
+            msg: permission denied
+            res: null
 
   schemas:
     ApiResponse:
