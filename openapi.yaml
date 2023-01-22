@@ -699,7 +699,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Job'
+              allOf:
+                - $ref: '#/components/schemas/Job'
+                - type: object
+                  properties:
+                    detail:
+                      $ref: '#/components/schemas/JobDetail'
+                  required:
+                    - detail
         required: true
       responses:
         200:
@@ -715,6 +722,7 @@ paths:
                         type: object
                         allOf:
                           - $ref: '#/components/schemas/Job'
+                          - $ref: '#/components/schemas/ModelTimestamp'
                           - type: object
                             properties:
                               id:
@@ -722,44 +730,10 @@ paths:
                                 description: 工作編號
                             required:
                               - id
-      security:
-        - api_key: []
-  /v1/job/detail/{job_id}:
-    post:
-      tags:
-        - 工作
-      summary: 設定工作詳情
-      operationId: setJobDetail
-      parameters:
-        - $ref: "#/components/parameters/jobIdParam"
-      requestBody:
-        description: 工作資訊
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JobDetail'
-        required: true
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      res:
-                        type: object
-                        allOf:
-                          - $ref: '#/components/schemas/Job'
                           - type: object
                             properties:
-                              id:
-                                type: integer
-                                description: 工作編號
-                            required:
-                              - id
+                              detail:
+                                $ref: '#/components/schemas/JobDetail'
       security:
         - api_key: []
   /v1/job/recommend:
@@ -1923,7 +1897,7 @@ components:
     JobDetail:
       type: object
       properties:
-        education:
+        educations:
           type: array
           description: 學歷需求
           items:
@@ -1938,13 +1912,12 @@ components:
             required:
               - department
               - degree
-          nullable: true
         certificates:
           type: array
           description: 證照需求
           items:
             $ref: '#/components/schemas/Certificate'
-        lang_skill:
+        lang_skills:
           type: array
           description: 語言需求
           items:
@@ -1971,9 +1944,9 @@ components:
           description: 其他需求
           type: string
       required:
-        - education
+        - educations
         - certificates
-        - lang_skill
+        - lang_skills
         - environments
         - skills
         - other_demand
