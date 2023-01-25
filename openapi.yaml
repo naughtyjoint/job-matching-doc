@@ -1312,7 +1312,7 @@ paths:
                 res: null
       security:
         - api_key: []
-  /v1/chat/messages/{user_id}:
+  /v1/chat/message/{user_id}:
     post:
       tags:
         - 訊息
