@@ -1318,27 +1318,14 @@ paths:
         - 訊息
       summary: 傳送訊息
       operationId: postChatMessage
+      description: 注意，user_id parameter為接收者id
       parameters:
         - $ref: '#/components/parameters/userIdParam'
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                user_id:
-                  type: integer
-                event_type:
-                  type: integer
-                event_id:
-                  type: integer
-                message:
-                  type: string
-              required:
-                - user_id
-                - event_type
-                - event_id
-                - message
+              $ref: '#/components/schemas/RequestChatMsg'
       responses:
         200:
           description: successful operation
@@ -1353,7 +1340,11 @@ paths:
                         type: object
                         properties:
                           data:
-                            $ref: '#/components/schemas/ChatMessage'
+                            allOf:
+                              - $ref: '#/components/schemas/ChatMessage'
+                              - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         404:
@@ -2031,14 +2022,26 @@ components:
         - address
         - description
     ChatMessage:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: 訊息Id
+            user_id:
+              type: integer
+              description: 發送者Id
+            chat_room_id:
+              type: integer
+              description: 訊息Room Id
+          required:
+            - id
+            - user_id
+            - chat_room_id
+        - $ref: '#/components/schemas/RequestChatMsg'
+    RequestChatMsg:
       type: object
       properties:
-        id:
-          type: integer
-          description: 訊息Id
-        user_id:
-          type: integer
-          description: 發送者Id
         event_type:
           type: integer
           description: 訊息類別(0：聊天訊息，1：案件(任務)，2：應徵職缺，3：邀約職缺，4：面試邀請，5：收取費用，6：系統文字訊息)
@@ -2050,8 +2053,6 @@ components:
           description: 訊息內文
           nullable: true
       required:
-        - id
-        - user_id
         - event_type
         - event_id
         - message
