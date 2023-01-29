@@ -564,6 +564,7 @@ paths:
                               - description
                               - remark
                           - $ref: '#/components/schemas/Company'
+                          - $ref: '#/components/schemas/ModelTimestamp'
                           
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
@@ -1759,6 +1760,9 @@ components:
         industry:
           type: string
           description: 公司類型
+        members:
+          type: integer
+          description: 公司人數
         contact:
           type: string
           description: 公司聯絡人
@@ -1799,6 +1803,7 @@ components:
           nullable: true
       required:
         - name
+        - members
         - industry
         - contact
         - phone
