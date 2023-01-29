@@ -622,7 +622,6 @@ paths:
                               - remark
                           - $ref: '#/components/schemas/Company'
                           - $ref: '#/components/schemas/ModelTimestamp'
-                          
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
@@ -662,6 +661,8 @@ paths:
                                 - $ref: "#/components/schemas/Job"
                         required:
                           - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/jobs/{user_id}:
@@ -699,6 +700,8 @@ paths:
                                 - $ref: "#/components/schemas/Job"
                         required:
                           - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/job/info/{job_id}:
@@ -744,6 +747,8 @@ paths:
                                 $ref: '#/components/schemas/JobDetail'
                             required:
                               - detail
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/job/create:
@@ -792,6 +797,8 @@ paths:
                             properties:
                               detail:
                                 $ref: '#/components/schemas/JobDetail'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/job/recommend:
@@ -827,6 +834,8 @@ paths:
                             required:
                               - id
                           - $ref: '#/components/schemas/Job'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   
@@ -1440,6 +1449,8 @@ paths:
           description: successful operation
           content:
             application/json: {}
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
 
