@@ -523,6 +523,63 @@ paths:
                           - $ref: '#/components/schemas/Company'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: company not found
+                res: null
+      security:
+        - api_key: []
+  /v1/company/info/{user_id}:
+    get:
+      tags:
+        - 公司
+      summary: 取得公開公司資訊
+      operationId: getUserCompanyInfoByUid
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 公司編號
+                            required:
+                              - id
+                              - avatar
+                              - fax
+                              - website
+                              - contact_time
+                              - others
+                              - description
+                              - remark
+                          - $ref: '#/components/schemas/Company'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: company not found
+                res: null
       security:
         - api_key: []
   /v1/company/update:
