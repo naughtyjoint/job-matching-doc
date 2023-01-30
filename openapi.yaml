@@ -807,13 +807,6 @@ paths:
         - 工作
       summary: 推薦工作案件
       operationId: getJobRecommend
-      parameters:
-        - name: user_id
-          in: query
-          description: 會員id
-          required: true
-          schema:
-            type: integer
       responses:
         200:
           description: successful operation
@@ -825,15 +818,20 @@ paths:
                   - type: object
                     properties:
                       res:
-                        allOf:
-                          - type: object
-                            properties:
-                              id:
-                                type: integer
-                                description: 工作編號
-                            required:
-                              - id
-                          - $ref: '#/components/schemas/Job'
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 工作編號
+                                  required:
+                                    - id
+                                - $ref: '#/components/schemas/Job'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
@@ -1880,6 +1878,13 @@ components:
     Job:
       type: object
       properties:
+        user_id:
+          type: integer
+          description: 會員編號
+        corp_id:
+          type: integer
+          description: 公司編號
+          nullable: true
         status:
           type: integer
           description: "案件狀態（0: 關閉, 1: 開啟）"
