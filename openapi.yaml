@@ -763,7 +763,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/Job'
+                - $ref: '#/components/schemas/JobReqBody'
                 - type: object
                   properties:
                     detail:
@@ -838,57 +838,12 @@ paths:
         - api_key: []
   
   #recruitment
-  /v1/job/recruit:
-    post:
-      tags:
-        - 招募
-      summary: 招募求職者（徵才）
-      description: 由業主主動對網站求職者發起招募
-      operationId: recruitUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecruitmentReqBody'
-        required: true
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/job/apply:
-    post:
-      tags:
-        - 招募
-      summary: 求職者主動尋求招募機會（應徵）
-      description: 由求職者向業主提出工作意願
-      operationId: userApply
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecruitmentReqBody'
-        required: true
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/recruitment/reject/{recruitment_id}:
+  /v1/recruitment/{recruitment_id}:
     get:
       tags:
         - 招募
-      summary: 拒絕招募
-      description: 業主方或求職者方拒絕招募請求
-      operationId: rejectRecruitment
+      summary: 查看相關招募清單
+      operationId: recruitmentInfo
       parameters:
         - $ref: '#/components/parameters/recruitmentParam'
       responses:
@@ -897,41 +852,33 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/recruitment/read/{recruitment_id}:
-    get:
-      tags:
-        - 招募
-      summary: 讀取招募訊息
-      description: 業主方或求職者方讀取招募請求
-      operationId: readRecruitment
-      parameters:
-        - $ref: '#/components/parameters/recruitmentParam'
-      responses:
-        200:
-          description: successful operation
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/Recruitment'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關招募
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: recruitment not found
+                res: null
       security:
         - api_key: []
-  /v1/recruitment/list:
+  /v1/recruitments:
     get:
       tags:
         - 招募
-      summary: 業主查看相關招募清單
-      description: 業主查看現有所有招募清單
+      summary: 查看相關招募清單
       operationId: recruitmentList
-      parameters:
-        - name: owner_id
-          in: query
-          description: 業主id
-          required: true
-          schema:
-            type: integer
       responses:
         200:
           description: successful operation
@@ -943,73 +890,38 @@ paths:
                   - type: object
                     properties:
                       res:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Recruitment'
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/Recruitment'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
-  /v1/recruitment/invitation:
-    get:
-      tags:
-        - 招募
-      summary: 求職者查看徵才清單
-      description: 求職方查看招募方主動發起的招募邀請列表
-      operationId: recruitmentInvitation
-      parameters:
-        - $ref: '#/components/parameters/userIdQryParam'
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      res:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Recruitment'
-      security:
-        - api_key: []
-  /v1/recruitment/application:
-    get:
-      tags:
-        - 招募
-      summary: 求職者查看應徵清單
-      description: 求職方查看自己發起的招募應徵列表
-      operationId: recruitmentApplication
-      parameters:
-        - $ref: '#/components/parameters/userIdQryParam'
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      res:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Recruitment'
-      security:
-        - api_key: []
-  /v1/recruitment/interview:
+  /v1/recruitment/create:
     post:
       tags:
         - 招募
-      summary: 發請面試邀請
-      description: 由業主向求職者發請面試邀請
-      operationId: createInterview
+      summary: 新增招募清單
+      operationId: createRecruitment
       requestBody:
+        description: 招募資訊
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InterviewReqBody'
+              allOf:
+                - type: object
+                  properties:
+                    user_id:
+                      type: integer
+                      description: 目標使用者ID(只有在type為1時需要)
+                - $ref: '#/components/schemas/RecruitmentReqBody'
         required: true
       responses:
         200:
@@ -1017,7 +929,62 @@ paths:
           content:
             application/json:
               schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/Recruitment'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/recruitment/update/{recruitment_id}:
+    post:
+      tags:
+        - 招募
+      summary: 更新招募狀態
+      operationId: updateRecruitment
+      requestBody:
+        description: 招募狀態
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: integer
+                  description: 招募狀態（1：讀取，2：婉拒，3：接受）
+              required:
+                - status
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/Recruitment'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關招募
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: recruitment not found
+                res: null
       security:
         - api_key: []
 
@@ -1875,16 +1842,9 @@ components:
         - phone
         - email
         - address
-    Job:
+    JobReqBody:
       type: object
       properties:
-        user_id:
-          type: integer
-          description: 會員編號
-        corp_id:
-          type: integer
-          description: 公司編號
-          nullable: true
         status:
           type: integer
           description: "案件狀態（0: 關閉, 1: 開啟）"
@@ -1949,8 +1909,6 @@ components:
           items:
             type: string
       required:
-        - user_id
-        - corp_id
         - status
         - name
         - type
@@ -2019,66 +1977,51 @@ components:
         - environments
         - skills
         - other_demand
+    Job:
+      allOf:
+        - type: object
+          properties:
+            user_id:
+              type: integer
+              description: 會員編號
+            corp_id:
+              type: integer
+              description: 公司編號
+              nullable: true
+          required:
+            - user_id
+            - corp_id
+        - $ref: '#/components/schemas/JobReqBody'
     Recruitment:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: 招募編號
-        job_id:
-          type: integer
-          description: 對應工作案件編號
-        owner_id:
-          type: integer
-          description: 業主編號
-        corp_id:
-          type: integer
-          description: 企業編號
-          nullable: false
-        candidate_id:
-          type: integer
-          description: 招募對象會員編號
-        type:
-          type: integer
-          description: 招募種類（1：招募方徵才，2：求職方應徵）
-        status:
-          type: integer
-          description: 招募狀態（0：一般，1：已婉拒）
-        read:
-          type: integer
-          description: 招募訊息已讀狀態（0：未讀，1：已讀）
-        job:
-          allOf:
-            - type: object
-              properties:
-                id:
-                  type: integer
-                  description: 案件編號
-              required:
-                - id
-            - $ref: '#/components/schemas/Job'
-      required:
-        - id
-        - job_id
-        - owner_id
-        - corp_id
-        - candidate_id
-        - type
-        - status
-        - read
-        - job
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: 招募編號
+            user_id:
+              type: integer
+              description: 對象會員編號
+            status:
+              type: integer
+              description: 招募狀態（0：一般，1：讀取，2：婉拒，3：接受）
+          required:
+            - id
+            - user_id
+            - status
+        - $ref: '#/components/schemas/RecruitmentReqBody'
     RecruitmentReqBody:
       type: object
       properties:
         job_id:
           type: integer
-          description: 工作案件編號
-        candidate_id:
+          description: 對應工作案件編號
+        type:
           type: integer
-          description: 招募對象user id
+          description: 招募種類（0：求職方-勞工應徵，1：招募方-業主徵才）
       required:
         - job_id
-        - candidate_id
+        - type
     InterviewReqBody:
       type: object
       properties:
