@@ -10,6 +10,7 @@ tags:
   - name: 履歷
   - name: 工作
   - name: 招募
+  - name: 面試
   - name: 任務
   - name: 申訴
   - name: 訊息
@@ -988,6 +989,157 @@ paths:
       security:
         - api_key: []
 
+  #interview
+  /v1/interview/{interview_id}:
+    get:
+      tags:
+        - 面試
+      summary: 查看相關面試資訊
+      operationId: interviewInfo
+      parameters:
+        - $ref: '#/components/parameters/interviewIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/Interview'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關面試資料
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: interview not found
+                res: null
+      security:
+        - api_key: []
+  /v1/interviews:
+    get:
+      tags:
+        - 面試
+      summary: 查看相關面試清單
+      operationId: interviewList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/Interview'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/interview/create:
+    post:
+      tags:
+        - 面試
+      summary: 業主新增面試
+      operationId: createInterview
+      requestBody:
+        description: 面試資訊
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterviewReqBody'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/Interview'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/interview/update/{interview_id}:
+    post:
+      tags:
+        - 面試
+      summary: 更新面試資訊
+      operationId: updateRecruitment
+      parameters:
+        - $ref: '#/components/parameters/interviewIdParam'
+      requestBody:
+        description: 面試修改資訊
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: integer
+                  description: 面試狀態（1：婉拒邀請，2：接受邀請）
+                calendar:
+                  type: boolean
+                  description: 是否加入行事曆
+              required:
+                - status
+                - calendar
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/Interview'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關面試資料
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: interview not found
+                res: null
+      security:
+        - api_key: []
+
   #task
   /v1/task/create:
     post:
@@ -1458,6 +1610,13 @@ components:
       name: recruitment_id
       in: path
       description: 招募物件id
+      required: true
+      schema:
+        type: integer
+    interviewIdParam:
+      name: interview_id
+      in: path
+      description: 面試物件id
       required: true
       schema:
         type: integer
@@ -2024,12 +2183,29 @@ components:
       required:
         - job_id
         - type
+    Interview:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: 面試編號
+            status:
+              type: integer
+              description: 面試狀態（0：等待答覆，1：婉拒邀請，2：接受邀請）
+          required:
+            - id
+            - status
+        - $ref: '#/components/schemas/InterviewReqBody'
     InterviewReqBody:
       type: object
       properties:
-        recruitment_id:
+        user_id:
           type: integer
-          description: 招募編號
+          description: 求職者會員編號
+        job_id:
+          type: integer
+          description: 工作編號
         interview_time:
           type: string
           description: 面試時間
@@ -2039,11 +2215,16 @@ components:
         description:
           type: string
           description: 面試說明
+        calendar:
+          type: boolean
+          description: 是否加入行事曆
       required:
-        - recruitment_id
+        - user_id
+        - job_id
         - interview_time
         - address
         - description
+        - calendar
     ChatMessage:
       allOf:
         - type: object
