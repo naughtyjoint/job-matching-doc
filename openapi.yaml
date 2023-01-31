@@ -1950,18 +1950,20 @@ components:
           items:
             $ref: '#/components/schemas/LangSkill'
         environments:
-          type: object
+          type: array
           description: 環境
-          properties:
-            name:
-              type: string
-              description: 環境名稱
-            path:
-              type: string
-              description: 檔案路徑
-          required:
-            - name
-            - path
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: 環境名稱
+              path:
+                type: string
+                description: 檔案路徑
+            required:
+              - name
+              - path
         skills:
           type: array
           description: 技能需求
