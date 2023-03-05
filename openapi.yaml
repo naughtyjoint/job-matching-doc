@@ -235,12 +235,15 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
-  /v1/search/users:
+  /v1/user/recommend:
     get:
       tags:
         - 會員
-      summary: 取得所有會員資訊
-      operationId: getAllUserInfo
+      summary: 推薦求職者
+      operationId: getUserRecommend
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
         200:
           description: successful operation
@@ -252,18 +255,66 @@ paths:
                   - type: object
                     properties:
                       res:
-                        type: object
-                        properties:
-                          data:
-                            type: array
-                            items:
-                              allOf:
-                                - type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      description: 會員編號
-                                - $ref: '#/components/schemas/FullUser'
+                        allOf:
+                          - $ref: '#/components/schemas/PageResponse'
+                          - type: object
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  allOf:
+                                    - type: object
+                                      properties:
+                                        id:
+                                          type: integer
+                                          description: 會員編號
+                                      required:
+                                        - id
+                                    - $ref: '#/components/schemas/FullUser'
+                                    - $ref: '#/components/schemas/ModelTimestamp'
+                            required:
+                              - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/search/users:
+    get:
+      tags:
+        - 會員
+      summary: 取得所有會員資訊
+      operationId: getAllUserInfo
+      parameters:
+        - $ref: '#/components/parameters/keywordParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/PageResponse'
+                          - type: object
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  allOf:
+                                    - type: object
+                                      properties:
+                                        id:
+                                          type: integer
+                                          description: 會員編號
+                                    - $ref: '#/components/schemas/FullUser'
+                            required:
+                              - data
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
@@ -808,6 +859,9 @@ paths:
         - 工作
       summary: 推薦工作案件
       operationId: getJobRecommend
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
         200:
           description: successful operation
@@ -819,25 +873,73 @@ paths:
                   - type: object
                     properties:
                       res:
-                        type: object
-                        properties:
-                          data:
-                            type: array
-                            items:
-                              allOf:
-                                - type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      description: 工作編號
-                                  required:
-                                    - id
-                                - $ref: '#/components/schemas/Job'
+                        allOf:
+                          - $ref: '#/components/schemas/PageResponse'
+                          - type: object
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  allOf:
+                                    - type: object
+                                      properties:
+                                        id:
+                                          type: integer
+                                          description: 工作編號
+                                      required:
+                                        - id
+                                    - $ref: '#/components/schemas/Job'
+                            required:
+                              - data
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
-  
+  /v1/search/jobs:
+    get:
+      tags:
+        - 工作
+      summary: 工作案件關鍵字搜尋
+      operationId: getJobSearch
+      parameters:
+        - $ref: '#/components/parameters/keywordParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/PageResponse'
+                          - type: object
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  allOf:
+                                    - type: object
+                                      properties:
+                                        id:
+                                          type: integer
+                                          description: 工作編號
+                                      required:
+                                        - id
+                                    - $ref: '#/components/schemas/Job'
+                                    - $ref: '#/components/schemas/ModelTimestamp'
+                            required:
+                              - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+
   #recruitment
   /v1/recruitment/{recruitment_id}:
     get:
@@ -1584,7 +1686,7 @@ components:
     limitParam:
       name: limit
       in: query
-      description: 單頁筆數(預設為24)
+      description: 單頁筆數(預設為10)
       schema:
         type: integer
     userIdParam:
@@ -1636,6 +1738,12 @@ components:
       required: true
       schema:
         type: integer
+    keywordParam:
+      name: keyword
+      in: query
+      description: 關鍵字
+      schema:
+        type: string
 
   responses:
     TokenUnauthenticated:
@@ -2282,6 +2390,18 @@ components:
       required:
         - created_at
         - updated_at
+    PageResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: 總筆數
+        lastPage:
+          type: integer
+          description: 總頁數
+      required:
+        - total
+        - lastPage
 
   securitySchemes:
     api_key:
