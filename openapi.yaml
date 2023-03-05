@@ -1245,6 +1245,80 @@ paths:
         - api_key: []
 
   #task
+  /v1/task/{task_id}:
+    get:
+      tags:
+        - 任務
+      summary: 取得工作任務內容
+      description: 取得工作任務內容
+      operationId: getTaskInfo
+      parameters:
+        - $ref: "#/components/parameters/taskIdParam"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/FullTask'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關任務資料
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: task not found
+                res: null
+      security:
+        - api_key: []
+  /v1/tasks:
+    get:
+      tags:
+        - 任務
+      summary: 查看相關工作任務清單
+      operationId: taskList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 任務編號
+                                  required:
+                                    - id
+                                - $ref: '#/components/schemas/FullTask'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
   /v1/task/create:
     post:
       tags:
@@ -1256,20 +1330,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                job_id:
-                  type: integer
-                user_id:
-                  type: integer
-                wage:
-                  type: integer
-                start_date:
-                  type: string
-                end_date:
-                  type: string
-                memo:
-                  type: string
+              $ref: '#/components/schemas/Task'
         required: true
       responses:
         200:
@@ -1277,34 +1338,56 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        allOf:
+                          - $ref: '#/components/schemas/Task'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 任務編號
+                            required:
+                              - id
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
-  /v1/task/update:
+  /v1/task/{task_id}/update:
     post:
       tags:
         - 任務
       summary: 更新工作任務內容
       description: 更新工作任務內容
       operationId: updateTask
+      parameters:
+        - $ref: "#/components/parameters/taskIdParam"
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                job_id:
+                status:
                   type: integer
-                user_id:
+                  description: "任務狀態 0: 等待答覆, 1: 拒絕邀約, 2: 已接受, 3: 已完成"
+                fee:
                   type: integer
-                wage:
+                  description: "任務結算狀態 0: 未收取, 1: 已收取/結清"
+                pay_way:
                   type: integer
-                start_date:
-                  type: string
-                end_date:
-                  type: string
+                  description: "任務給薪方式 0: 現金支付, 1: 轉上支付"
                 memo:
                   type: string
+                  description: 任務備註
+              required:
+                - status
+                - fee
         required: true
       responses:
         200:
@@ -1312,129 +1395,35 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/task/user/{user_id}:
-    get:
-      tags:
-        - 任務
-      summary: 勞工查看任務列表
-      description: 勞工查看任務列表
-      operationId: getUserTask
-      parameters:
-        - $ref: '#/components/parameters/userIdParam'
-      responses:
-        200:
-          description: successful operation
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 任務編號
+                            required:
+                              - id
+                          - $ref: '#/components/schemas/FullTask'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關任務資料
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: task not found
+                res: null
       security:
         - api_key: []
-  /v1/task/owner/{user_id}:
-    get:
-      tags:
-        - 任務
-      summary: 業主查看任務列表
-      description: 業主查看任務列表
-      operationId: getOwnerTask
-      parameters:
-        - $ref: '#/components/parameters/userIdParam'
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/task/{task_id}/status/{status}:
-    get:
-      tags:
-        - 任務
-      summary: 更新任務狀態
-      description: |
-        更新任務狀態，狀態列表如下
-
-        (0: 尚未執行、1: 執行中、2: 執行結束、3: 已結算)
-      operationId: updateTaskStatus
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/task/rate:
-    post:
-      tags:
-        - 任務
-      summary: 勞工評分任務
-      description: 勞工對指定任務評分，分數範圍為1至5
-      operationId: rateTask
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/task/comment:
-    post:
-      tags:
-        - 任務
-      summary: 勞工評論任務
-      description: 勞工對指定任務發表評論
-      operationId: commentTask
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/task/owner/rate:
-    post:
-      tags:
-        - 任務
-      summary: 業主評分任務
-      description: 業主對指定任務評分，分數範圍為1至5
-      operationId: ownerRateTask
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-  /v1/task/owner/comment:
-    post:
-      tags:
-        - 任務
-      summary: 業主評論任務
-      description: 業主對完成指定任務之勞工發表評論
-      operationId: ownerCommentTask
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - api_key: []
-
+  
   #complaint
   /v1/complaint/create:
     post:
@@ -1721,6 +1710,13 @@ components:
       name: interview_id
       in: path
       description: 面試物件id
+      required: true
+      schema:
+        type: integer
+    taskIdParam:
+      name: task_id
+      in: path
+      description: 工作任務id
       required: true
       schema:
         type: integer
@@ -2263,6 +2259,52 @@ components:
             - user_id
             - corp_id
         - $ref: '#/components/schemas/JobReqBody'
+    Task:
+      type: object
+      properties:
+        job_id:
+          type: integer
+          description: 工作編號
+        user_id:
+          type: integer
+          description: 求職者編號
+        wage:
+          type: integer
+          description: 薪資
+        start_at:
+          type: string
+          description: 任務開始時間
+        end_at:
+          type: string
+          description: 任務結束時間
+        memo:
+          type: string
+          description: 任務備註
+      required:
+        - job_id
+        - user_id
+        - wage
+        - start_at
+        - end_at
+        - memo
+    FullTask:
+      allOf:
+        - $ref: '#/components/schemas/Task'
+        - type: object
+          properties:
+            status:
+              type: integer
+              description: '任務狀態 0: 等待答覆, 1: 拒絕邀約, 2: 已接受, 3: 已完成'
+            fee:
+              type: integer
+              description: '任務結算狀態 0: 未收取, 1: 已收取/結清'
+            pay_way:
+              type: integer
+              description: '任務給薪方式 0: 現金支付, 1: 轉上支付'
+          required:
+            - status
+            - fee
+            - pay_way
     Recruitment:
       allOf:
         - type: object
@@ -2402,7 +2444,7 @@ components:
       required:
         - total
         - lastPage
-
+    
   securitySchemes:
     api_key:
       type: http
