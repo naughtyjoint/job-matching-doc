@@ -12,6 +12,7 @@ tags:
   - name: 招募
   - name: 面試
   - name: 任務
+  - name: 評論
   - name: 申訴
   - name: 訊息
 paths:
@@ -1423,7 +1424,139 @@ paths:
                 res: null
       security:
         - api_key: []
-  
+
+  #comment
+  /v1/comments:
+    get:
+      tags:
+        - 評論
+      summary: 取得自己的所有評論列表
+      operationId: getUserComments
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/Comment'
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 評論編號
+                                  required:
+                                    - id
+                                    - content
+                                    - pictures
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/comments/{user_id}:
+    get:
+      tags:
+        - 評論
+      summary: 取得使用者的所有評論列表
+      operationId: getCommentsByUid
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/Comment'
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 評論編號
+                                  required:
+                                    - id
+                                    - content
+                                    - pictures
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/comment/create:
+    post:
+      tags:
+        - 評論
+      summary: 新增評論
+      operationId: createComment
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Comment'
+                - type: object
+                  properties:
+                    pictures:
+                      type: array
+                      description: 評論照片檔案
+                      items:
+                        type: string
+                        format: binary
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/Comment'
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 評論編號
+                            required:
+                              - id
+                              - content
+                              - pictures
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+
   #complaint
   /v1/complaint/create:
     post:
@@ -2377,6 +2510,37 @@ components:
         - address
         - description
         - calendar
+    Comment:
+      properties:
+        task_id:
+          type: integer
+          description: 任務編號
+        user_id:
+          type: integer
+          description: 評論人編號
+        type:
+          type: integer
+          description: '0 會員身分(勞工), 1 公司(業主)'
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+          description: '評論分數 0 ~ 5, step: 0.5'
+        content:
+          type: string
+          description: 評論內容
+          nullable: true
+        pictures:
+          type: array
+          description: 評論照片路徑
+          items:
+            type: string
+      required:
+        - task_id
+        - user_id
+        - type
+        - score
     ChatMessage:
       allOf:
         - type: object
