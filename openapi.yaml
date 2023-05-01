@@ -1345,16 +1345,22 @@ paths:
                     properties:
                       res:
                         type: object
-                        allOf:
-                          - $ref: '#/components/schemas/Task'
-                          - $ref: '#/components/schemas/ModelTimestamp'
-                          - type: object
-                            properties:
-                              id:
-                                type: integer
-                                description: 任務編號
-                            required:
-                              - id
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/Task'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 任務編號
+                                  required:
+                                    - id
+                        required:
+                          - data
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
@@ -1422,6 +1428,53 @@ paths:
               example:
                 msg: task not found
                 res: null
+      security:
+        - api_key: []
+  /v1/task/{task_id}/punch/{action}:
+    get:
+      tags:
+        - 任務
+      summary: 任務上下工打卡
+      operationId: taskPunchTime
+      parameters:
+          - $ref: "#/components/parameters/taskIdParam"
+          - name: action
+            in: path
+            description: 打卡動作（in：上工，out：下工）
+            required: true
+            schema:
+              type: string
+              enum: [in, out]
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 任務編號
+                                  required:
+                                    - id
+                                - $ref: '#/components/schemas/FullTask'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
 
@@ -2273,6 +2326,16 @@ components:
           type: object
           description: 工作時間
           properties:
+            type:
+              type: integer
+              description: 工作計時型態（1:單次,2:數次）
+            workday:
+              type: array
+              description: 工作日設定，working.type為2時需要
+              minimum: 1
+              items:
+                type: string
+                description: 星期縮寫Mon、Tue、Wed、Thu、Fri、Sat、Sun
             start_date:
               type: string
               description: 起始日期
@@ -2285,6 +2348,8 @@ components:
             end_time:
               type: string
               description: 下班時間
+          required:
+            - type
         description:
           type: string
           description: 案件內容敘述
@@ -2404,12 +2469,6 @@ components:
         wage:
           type: integer
           description: 薪資
-        start_at:
-          type: string
-          description: 任務開始時間
-        end_at:
-          type: string
-          description: 任務結束時間
         memo:
           type: string
           description: 任務備註
@@ -2417,8 +2476,6 @@ components:
         - job_id
         - user_id
         - wage
-        - start_at
-        - end_at
         - memo
     FullTask:
       allOf:
@@ -2434,10 +2491,24 @@ components:
             pay_way:
               type: integer
               description: '任務給薪方式 0: 現金支付, 1: 轉上支付'
+            start_at:
+              type: integer
+              description: 任務開始時間
+            end_at:
+              type: integer
+              description: 任務結束時間
+            punch_in:
+              type: string
+              description: '打工上工時間紀錄'
+            punch_out:
+              type: string
+              description: '打工下工時間紀錄'
           required:
             - status
             - fee
             - pay_way
+            - start_at
+            - end_at
     Recruitment:
       allOf:
         - type: object
