@@ -1093,7 +1093,7 @@ paths:
                 res: null
       security:
         - api_key: []
-
+  
   #interview
   /v1/interview/{interview_id}:
     get:
@@ -1475,6 +1475,58 @@ paths:
                           - data
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/task/checkout:
+    post:
+      tags:
+        - 任務
+      summary: 任務薪資結算
+      description: 結算指定工作任務薪資
+      operationId: taskCheckout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task_id:
+                  type: integer
+                  description: "任務狀態 0: 等待答覆, 1: 拒絕邀約, 2: 已接受, 3: 已完成"
+                day_type:
+                  type: integer
+                  description: "工作日型態（加班費計算用）1: 休息日, 2: 例假日、休假日、國定假日"
+                pay_way:
+                  type: integer
+                  description: "任務給薪方式 0: 現金支付, 1: 轉上支付"
+              required:
+                - task_id
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: integer
+                        description: 薪資總計
+                        example: 800
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關任務資料
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: task not found
+                res: null
       security:
         - api_key: []
 
