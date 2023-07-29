@@ -1305,13 +1305,6 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      description: 任務編號
-                                  required:
-                                    - id
                                 - $ref: '#/components/schemas/FullTask'
                                 - $ref: '#/components/schemas/ModelTimestamp'
                         required:
@@ -1408,13 +1401,6 @@ paths:
                     properties:
                       res:
                         allOf:
-                          - type: object
-                            properties:
-                              id:
-                                type: integer
-                                description: 任務編號
-                            required:
-                              - id
                           - $ref: '#/components/schemas/FullTask'
                           - $ref: '#/components/schemas/ModelTimestamp'
         401:
@@ -1462,19 +1448,174 @@ paths:
                             type: array
                             items:
                               allOf:
-                                - type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      description: 任務編號
-                                  required:
-                                    - id
                                 - $ref: '#/components/schemas/FullTask'
                                 - $ref: '#/components/schemas/ModelTimestamp'
                         required:
                           - data
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
+        403:
+          description: 打卡失敗，時間錯誤
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: 'punch time error'
+                res: null
+      security:
+        - api_key: []
+  /v1/task/re-punch:
+    post:
+      tags:
+        - 任務
+      summary: 補打卡
+      description: 任務補打卡（只有雇主可呼叫）
+      operationId: taskRePunch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task_id:
+                  type: integer
+                  description: "任務編號"
+                  example: 30
+                action:
+                  type: string
+                  description: "補上班in/補下班out"
+                  example: "in"
+                adjust_time:
+                  type: string
+                  description: "補打卡時間"
+                  example: "2023-08-01 10:00:00"
+              required:
+                - task_id
+                - action
+                - adjust_time
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/FullTask'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關任務資料
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: task not found
+                res: null
+      security:
+        - api_key: []  
+  /v1/task/{task_id}checkout/preview:
+    get:
+      tags:
+        - 任務
+      summary: 任務薪資預算
+      description: 預覽指定工作任務薪資結算
+      operationId: taskCheckoutPre
+      parameters:
+        - $ref: "#/components/parameters/taskIdParam"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          wage:
+                            type: integer
+                            description: 本薪
+                            example: 1000
+                          defualt_wage:
+                            type: integer
+                            description: 預設薪資
+                            example: 800
+                          otPay:
+                            type: integer
+                            description: 加班費
+                            example: 0
+                          total:
+                            type: integer
+                            description: 總薪資
+                            example: 1000
+                          formula:
+                            type: object
+                            properties:
+                              wage:
+                                type: string
+                                example: (200 * 5)
+                              otPay:
+                                type: string
+                                example: ""
+                              defualt_wage:
+                                type: string
+                                example: (200 * 4)
+                            required:
+                              - wage
+                              - otPay
+                              - defualt_wage
+                          punch_in:
+                            type: string
+                            description: 打卡上班時間
+                            example: '2023-05-31 08:00:00'
+                            nullable: true
+                          punch_out:
+                            type: string
+                            description: 打卡下班時間
+                            example: '2023-05-31 13:00:00'
+                            nullable: true
+                          start_at:
+                            type: string
+                            description: 任務預設開始時間
+                            example: '2023-05-31 08:00:00'
+                          end_at:
+                            type: string
+                            description: 任務預設結束時間
+                            example: '2023-05-31 12:00:00'
+                        required:
+                          - wage
+                          - defualt_wage
+                          - otPay
+                          - total
+                          - formula
+                          - punch_in
+                          - punch_out
+                          - start_at
+                          - end_at
+                        nullable: false
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關任務資料
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: task not found
+                res: null
       security:
         - api_key: []
   /v1/task/checkout:
@@ -2411,7 +2552,7 @@ components:
           properties:
             type:
               type: integer
-              description: "薪酬種類（1：時薪，2：月薪）"
+              description: "薪酬種類（1：時薪，2：月薪，3：一次給薪）"
             amount:
               type: string
               description: 薪資
@@ -2534,6 +2675,9 @@ components:
         - $ref: '#/components/schemas/Task'
         - type: object
           properties:
+            id:
+              type: integer
+              description: 任務編號
             status:
               type: integer
               description: '任務狀態 0: 等待答覆, 1: 拒絕邀約, 2: 已接受, 3: 已完成'
@@ -2544,10 +2688,10 @@ components:
               type: integer
               description: '任務給薪方式 0: 現金支付, 1: 轉上支付'
             start_at:
-              type: integer
+              type: string
               description: 任務開始時間
             end_at:
-              type: integer
+              type: string
               description: 任務結束時間
             punch_in:
               type: string
@@ -2555,12 +2699,40 @@ components:
             punch_out:
               type: string
               description: '打工下工時間紀錄'
+            checkout_wage:
+              type: integer
+              nullable: true
+              description: '結帳金額'
+            manual_punch:
+              type: array
+              items:
+                type: object
+                properties:
+                  action:
+                    type: string
+                    description: 補打卡類型(in/out)
+                  time:
+                    type: string
+                    description: 新打卡時間
+                  updated_at:
+                    type: string
+                    description: 補打卡執行時間
+                required:
+                  - action
+                  - time
+                  - updated_at
+              nullable: true
           required:
+            - id
             - status
             - fee
             - pay_way
             - start_at
             - end_at
+            - punch_in
+            - punch_out
+            - checkout_wage
+            - manual_punch
     Recruitment:
       allOf:
         - type: object
