@@ -3,7 +3,7 @@ info:
   title: 工作媒合平台
   version: 1.0.0
 servers:
-- url: https://oqudifu.com/
+ - url: https://findjob.lemaxim.tw/
 tags:
   - name: 會員
   - name: 公司
@@ -2556,9 +2556,21 @@ components:
             amount:
               type: string
               description: 薪資
+            checkout_cycle:
+              type: integer
+              description: "結算總類（1：單次，2：週期（指定第幾日），3：週期（指定星期幾））"
+            checkout_date:
+              type: array
+              nullable: true
+              description: "結算日（checkout_cycle為2或3時設定）"
+              items:
+                type: integer
+                description: 星期幾或每月第幾日
           required:
             - type
             - amount
+            - checkout_cycle
+            - checkout_date
         tags:
           type: array
           description: 標籤
@@ -2705,6 +2717,7 @@ components:
               description: '結帳金額'
             manual_punch:
               type: array
+              description: '手動補打卡資訊'
               items:
                 type: object
                 properties:
