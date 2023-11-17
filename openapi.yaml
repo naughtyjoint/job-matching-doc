@@ -2603,7 +2603,7 @@ components:
           type: integer
           description: 需求人數
         seniority:
-          type: string
+          type: integer
           description: 工作年資
         address:
           type: string
@@ -2653,7 +2653,7 @@ components:
               type: integer
               description: "薪酬種類（1：時薪，2：月薪，3：一次給薪）"
             amount:
-              type: string
+              type: integer
               description: 薪資
             checkout_cycle:
               type: integer
