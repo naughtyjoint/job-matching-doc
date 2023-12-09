@@ -1381,6 +1381,43 @@ paths:
         - 任務
       summary: 查看相關工作任務清單
       operationId: taskList
+      parameters:
+        - $ref: "#/components/parameters/checkoutParam"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/FullTask'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/tasks/{user_id}:
+    get:
+      tags:
+        - 任務
+      summary: 查看相關工作任務清單，指定對方使用者ID
+      description: 此API會列出所有你與指定使用者的所有任務資料
+      operationId: taskUserList
+      parameters:
+        - $ref: "#/components/parameters/checkoutParam"
+        - $ref: "#/components/parameters/userIdParam"
       responses:
         200:
           description: successful operation
@@ -2210,6 +2247,12 @@ components:
       name: keyword
       in: query
       description: 關鍵字
+      schema:
+        type: string
+    checkoutParam:
+      name: checkout
+      in: query
+      description: 結清判斷，帶 true 或 false
       schema:
         type: string
 
