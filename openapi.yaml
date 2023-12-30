@@ -1652,12 +1652,12 @@ paths:
                 res: null
       security:
         - api_key: []  
-  /v1/task/{task_id}checkout/preview:
+  /v1/task/{task_id}/checkout/preview:
     get:
       tags:
         - 任務
       summary: 任務薪資預算
-      description: 預覽指定工作任務薪資結算
+      description: 預覽指定工作任務與其相關任務薪資結算
       operationId: taskCheckoutPre
       parameters:
         - $ref: "#/components/parameters/taskIdParam"
@@ -1674,67 +1674,36 @@ paths:
                       res:
                         type: object
                         properties:
-                          wage:
+                          total_tasks:
                             type: integer
-                            description: 本薪
-                            example: 1000
-                          defualt_wage:
+                            description: 結算任務總數
+                          total_wage:
                             type: integer
-                            description: 預設薪資
-                            example: 800
-                          otPay:
+                            description: 總本薪
+                          total_default_wage:
                             type: integer
-                            description: 加班費
-                            example: 0
-                          total:
+                            description: 總預設薪資
+                          total_ot_pay:
                             type: integer
-                            description: 總薪資
-                            example: 1000
-                          formula:
-                            type: object
-                            properties:
-                              wage:
-                                type: string
-                                example: (200 * 5)
-                              otPay:
-                                type: string
-                                example: ""
-                              defualt_wage:
-                                type: string
-                                example: (200 * 4)
-                            required:
-                              - wage
-                              - otPay
-                              - defualt_wage
-                          punch_in:
-                            type: string
-                            description: 打卡上班時間
-                            example: '2023-05-31 08:00:00'
-                            nullable: true
-                          punch_out:
-                            type: string
-                            description: 打卡下班時間
-                            example: '2023-05-31 13:00:00'
-                            nullable: true
-                          start_at:
-                            type: string
-                            description: 任務預設開始時間
-                            example: '2023-05-31 08:00:00'
-                          end_at:
-                            type: string
-                            description: 任務預設結束時間
-                            example: '2023-05-31 12:00:00'
+                            description: 總加班費
+                          total_ot_time:
+                            type: integer
+                            description: 總加班時長
+                          total_sum:
+                            type: integer
+                            description: 結算總薪資
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/TaskCheckoutCal'
                         required:
-                          - wage
-                          - defualt_wage
-                          - otPay
-                          - total
-                          - formula
-                          - punch_in
-                          - punch_out
-                          - start_at
-                          - end_at
-                        nullable: false
+                          - total_tasks
+                          - total_wage
+                          - total_default_wage
+                          - total_ot_pay
+                          - total_ot_time
+                          - total_sum
+                          - data
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         404:
@@ -2893,6 +2862,78 @@ components:
             - punch_out
             - checkout_wage
             - manual_punch
+    TaskCheckoutCal:
+      type: object
+      properties:
+        task_id:
+          type: integer
+          description: 任務編號
+        wage:
+          type: integer
+          description: 本薪
+          example: 1000
+        defualt_wage:
+          type: integer
+          description: 預設薪資
+          example: 800
+        ot_pay:
+          type: integer
+          description: 加班費
+          example: 0
+        ot_time:
+          type: integer
+          description: 加班時間
+          example: 0
+        total:
+          type: integer
+          description: 總薪資
+          example: 1000
+        formula:
+          type: object
+          properties:
+            wage:
+              type: string
+              example: (200 * 5)
+            ot_pay:
+              type: string
+              example: ""
+            defualt_wage:
+              type: string
+              example: (200 * 4)
+          required:
+            - wage
+            - ot_pay
+            - defualt_wage
+        punch_in:
+          type: string
+          description: 打卡上班時間
+          example: '2023-05-31 08:00:00'
+          nullable: true
+        punch_out:
+          type: string
+          description: 打卡下班時間
+          example: '2023-05-31 13:00:00'
+          nullable: true
+        start_at:
+          type: string
+          description: 任務預設開始時間
+          example: '2023-05-31 08:00:00'
+        end_at:
+          type: string
+          description: 任務預設結束時間
+          example: '2023-05-31 12:00:00'
+      required:
+        - task_id
+        - wage
+        - defualt_wage
+        - ot_pay
+        - ot_time
+        - total
+        - formula
+        - punch_in
+        - punch_out
+        - start_at
+        - end_at
     Recruitment:
       allOf:
         - type: object
