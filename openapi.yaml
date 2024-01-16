@@ -1612,18 +1612,25 @@ paths:
                   type: integer
                   description: "任務編號"
                   example: 30
-                action:
-                  type: string
-                  description: "補上班in/補下班out"
-                  example: "in"
-                adjust_time:
-                  type: string
-                  description: "補打卡時間"
-                  example: "2023-08-01 10:00:00"
+                data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      action:
+                        type: string
+                        description: "補上班in/補下班out"
+                        example: "in"
+                      adjust_time:
+                        type: string
+                        description: "補打卡時間"
+                        example: "2023-08-01 10:00:00"
+                    required:
+                      - action
+                      - adjust_time
               required:
                 - task_id
-                - action
-                - adjust_time
+                - data
         required: true
       responses:
         200:
