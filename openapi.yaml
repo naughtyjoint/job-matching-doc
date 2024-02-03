@@ -1470,18 +1470,16 @@ paths:
                         type: object
                         properties:
                           data:
-                            type: array
-                            items:
-                              allOf:
-                                - $ref: '#/components/schemas/Task'
-                                - $ref: '#/components/schemas/ModelTimestamp'
-                                - type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      description: 任務編號
-                                  required:
-                                    - id
+                            allOf:
+                              - $ref: '#/components/schemas/Task'
+                              - $ref: '#/components/schemas/ModelTimestamp'
+                              - type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    description: 任務編號
+                                required:
+                                  - id
                         required:
                           - data
         401:
