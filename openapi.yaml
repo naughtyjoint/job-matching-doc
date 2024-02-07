@@ -1677,38 +1677,7 @@ paths:
                   - type: object
                     properties:
                       res:
-                        type: object
-                        properties:
-                          total_tasks:
-                            type: integer
-                            description: 結算任務總數
-                          total_wage:
-                            type: integer
-                            description: 總本薪
-                          total_default_wage:
-                            type: integer
-                            description: 總預設薪資
-                          total_ot_pay:
-                            type: integer
-                            description: 總加班費
-                          total_ot_time:
-                            type: integer
-                            description: 總加班時長
-                          total_sum:
-                            type: integer
-                            description: 結算總薪資
-                          data:
-                            type: array
-                            items:
-                              $ref: '#/components/schemas/TaskCheckoutCal'
-                        required:
-                          - total_tasks
-                          - total_wage
-                          - total_default_wage
-                          - total_ot_pay
-                          - total_ot_time
-                          - total_sum
-                          - data
+                        $ref: '#/components/schemas/TaskPreCheckoutSum'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         404:
@@ -1758,9 +1727,7 @@ paths:
                   - type: object
                     properties:
                       res:
-                        type: integer
-                        description: 薪資總計
-                        example: 800
+                        $ref: '#/components/schemas/TaskCheckoutSum'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         404:
@@ -2867,6 +2834,50 @@ components:
             - punch_out
             - checkout_wage
             - manual_punch
+    TaskCheckoutSum:
+      type: object
+      properties:
+        total_tasks:
+          type: integer
+          description: 結算任務總數
+        total_wage:
+          type: integer
+          description: 總本薪
+        total_ot_pay:
+          type: integer
+          description: 總加班費
+        total_ot_time:
+          type: integer
+          description: 總加班時長
+        total_sum:
+          type: integer
+          description: 結算總薪資
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskCheckoutCal'
+      required:
+        - total_tasks
+        - total_wage
+        - total_ot_pay
+        - total_ot_time
+        - total_sum
+        - data
+    TaskPreCheckoutSum:
+      allOf:
+        - $ref: '#/components/schemas/TaskCheckoutSum'
+        - type: object
+          properties:
+            total_default_wage:
+              type: integer
+              description: 總預設薪資
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/TaskPreCheckoutCal'
+          required:
+            - total_default_wage
+            - data
     TaskCheckoutCal:
       type: object
       properties:
@@ -2877,10 +2888,6 @@ components:
           type: integer
           description: 本薪
           example: 1000
-        defualt_wage:
-          type: integer
-          description: 預設薪資
-          example: 800
         ot_pay:
           type: integer
           description: 加班費
@@ -2902,13 +2909,9 @@ components:
             ot_pay:
               type: string
               example: ""
-            defualt_wage:
-              type: string
-              example: (200 * 4)
           required:
             - wage
             - ot_pay
-            - defualt_wage
         punch_in:
           type: string
           description: 打卡上班時間
@@ -2930,7 +2933,6 @@ components:
       required:
         - task_id
         - wage
-        - defualt_wage
         - ot_pay
         - ot_time
         - total
@@ -2939,6 +2941,34 @@ components:
         - punch_out
         - start_at
         - end_at
+    TaskPreCheckoutCal:
+      allOf:
+        - $ref: '#/components/schemas/TaskCheckoutCal'
+        - type: object
+          properties:
+            default_wage:
+              type: integer
+              description: 預設薪資
+              example: 800
+            formula:
+              type: object
+              properties:
+                wage:
+                  type: string
+                  example: (200 * 5)
+                ot_pay:
+                  type: string
+                  example: ""
+                default_wage:
+                  type: string
+                  example: (200 * 4)
+              required:
+                - wage
+                - ot_pay
+                - default_wage
+          required:
+            - default_wage
+            - formula
     Recruitment:
       allOf:
         - type: object
