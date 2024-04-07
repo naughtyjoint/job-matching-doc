@@ -15,6 +15,7 @@ tags:
   - name: 評論
   - name: 申訴
   - name: 訊息
+  - name: 其他
 paths:
   #user
   /v1/user/login:
@@ -2114,6 +2115,69 @@ paths:
       security:
         - api_key: []
 
+  #common
+  /v1/common/industries:
+    get:
+      tags:
+        - 其他
+      summary: 查看產業類別／證照清單
+      operationId: industriesList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        description: 主類別編碼群組（此為範例數字）
+                        properties:
+                          100000:
+                            type: object
+                            description: 副類別編碼群組（此為範例數字）
+                            properties:
+                              000100:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      description: 主類別編碼
+                                      example: 100000
+                                    min_code:
+                                      type: string
+                                      description: 副類別編碼
+                                      example: 000100
+                                    sub_code:
+                                      type: string
+                                      description: 子類別編碼
+                                      example: 100101
+                                    ind_name:
+                                      type: string
+                                      description: 主類別名稱
+                                    ind_min_name:
+                                      type: string
+                                      description: 副類別名稱
+                                    op_name:
+                                      type: string
+                                      description: 子類別名稱
+                                  required:
+                                    - code
+                                    - min_code
+                                    - sub_code
+                                    - ind_name
+                                    - ind_min_name
+                                    - op_name
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+
 components:
   parameters:
     pageParam:
@@ -2611,7 +2675,13 @@ components:
               minimum: 1
               items:
                 type: string
-                description: 星期縮寫Mon、Tue、Wed、Thu、Fri、Sat、Sun
+                description: 星期縮寫 Mon、Tue、Wed、Thu、Fri、Sat、Sun
+            sho_rest_day:
+              type: string
+              description: 指定休息日，格式為星期縮寫 Mon、Tue、Wed、Thu、Fri、Sat、Sun，不可與例假日重複
+            li_rest_day:
+              type: string
+              description: 指定例假日，格式為星期縮寫 Mon、Tue、Wed、Thu、Fri、Sat、Sun，不可與休息日重複
             start_date:
               type: string
               description: 起始日期
@@ -2930,6 +3000,9 @@ components:
           type: string
           description: 任務預設結束時間
           example: '2023-05-31 12:00:00'
+        day_type:
+          type: integer
+          description: 任務日類型（0：平日，1：休息日，2：例假日）
       required:
         - task_id
         - wage
