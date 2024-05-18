@@ -2120,7 +2120,7 @@ paths:
     get:
       tags:
         - 其他
-      summary: 查看產業類別／證照清單
+      summary: 查看產業類別清單
       operationId: industriesList
       responses:
         200:
@@ -2177,7 +2177,190 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
-
+  /v1/common/certificates:
+    get:
+      tags:
+        - 其他
+      summary: 查看證照類別清單
+      operationId: certificatesList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        description: 主類別編碼群組（此為範例數字）
+                        properties:
+                          100000:
+                            type: object
+                            description: 副類別編碼群組（此為範例數字）
+                            properties:
+                              000100:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      description: 主類別編碼
+                                      example: 100000
+                                    min_code:
+                                      type: string
+                                      description: 副類別編碼
+                                      example: 000100
+                                    sub_code:
+                                      type: string
+                                      description: 子類別編碼
+                                      example: 100101
+                                    maj_name:
+                                      type: string
+                                      description: 主類別名稱
+                                    min_name:
+                                      type: string
+                                      description: 副類別名稱
+                                    cert_name:
+                                      type: string
+                                      description: 子類別名稱
+                                  required:
+                                    - code
+                                    - min_code
+                                    - sub_code
+                                    - maj_name
+                                    - min_name
+                                    - cert_name
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/common/tools:
+    get:
+      tags:
+        - 其他
+      summary: 查看工具類別清單
+      operationId: toolsList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        description: 主類別編碼群組（此為範例數字）
+                        properties:
+                          100000:
+                            type: object
+                            description: 副類別編碼群組（此為範例數字）
+                            properties:
+                              000100:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      description: 主類別編碼
+                                      example: 100000
+                                    min_code:
+                                      type: string
+                                      description: 副類別編碼
+                                      example: 000100
+                                    sub_code:
+                                      type: string
+                                      description: 子類別編碼
+                                      example: 100101
+                                    maj_name:
+                                      type: string
+                                      description: 主類別名稱
+                                    min_name:
+                                      type: string
+                                      description: 副類別名稱
+                                    tool_name:
+                                      type: string
+                                      description: 子類別名稱
+                                  required:
+                                    - code
+                                    - min_code
+                                    - sub_code
+                                    - maj_name
+                                    - min_name
+                                    - tool_name
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/common/skills:
+    get:
+      tags:
+        - 其他
+      summary: 查看技能類別清單
+      operationId: skillsList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        description: 主類別編碼群組（此為範例數字）
+                        properties:
+                          100000:
+                            type: object
+                            description: 副類別編碼群組（此為範例數字）
+                            properties:
+                              000100:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      description: 主類別編碼
+                                      example: 100000
+                                    min_code:
+                                      type: string
+                                      description: 副類別編碼
+                                      example: 000100
+                                    sub_code:
+                                      type: string
+                                      description: 子類別編碼
+                                      example: 100101
+                                    maj_name:
+                                      type: string
+                                      description: 主類別名稱
+                                    min_name:
+                                      type: string
+                                      description: 副類別名稱
+                                    skill_name:
+                                      type: string
+                                      description: 子類別名稱
+                                  required:
+                                    - code
+                                    - min_code
+                                    - sub_code
+                                    - maj_name
+                                    - min_name
+                                    - skill_name
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  
 components:
   parameters:
     pageParam:
