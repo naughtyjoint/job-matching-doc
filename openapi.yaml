@@ -680,6 +680,132 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
+  /v1/company/{company_id}/images:
+    get:
+      tags:
+        - 公司
+      summary: 取得公司圖片
+      operationId: getCompanyImagesBy
+      parameters:
+        - $ref: '#/components/parameters/companyIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            minimum: 0
+                            items:
+                              $ref: '#/components/schemas/CompanyImage'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: company not found
+                res: null
+      security:
+        - api_key: []
+    post:
+      tags:
+        - 公司
+      summary: 上傳公司圖片
+      operationId: uploadCompanyImages
+      parameters:
+        - $ref: '#/components/parameters/companyIdParam'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 圖片檔案
+              required:
+                - images
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CompanyImage'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: company not found
+                res: null
+      security:
+        - api_key: []
+  /v1/company/image/{image_id}:
+    delete:
+      tags:
+        - 公司
+      summary: 刪除公司圖片
+      operationId: deleteCompanyImageById
+      parameters:
+        - name: image_id
+          in: path
+          description: 公司圖片id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: image not found
+                res: null
+      security:
+        - api_key: []
+        
 
   #job
   /v1/jobs:
@@ -2443,6 +2569,13 @@ components:
       description: 結清判斷，帶 true 或 false
       schema:
         type: string
+    companyIdParam:
+      name: company_id
+      in: path
+      required: true
+      description: 公司id
+      schema:
+        type: integer
 
   responses:
     TokenUnauthenticated:
@@ -2810,6 +2943,18 @@ components:
         - phone
         - email
         - address
+    CompanyImage:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 公司圖片id
+        image_path:
+          type: string
+          description: 圖片位置
+      required:
+        - id
+        - image_path
     JobReqBody:
       type: object
       properties:
