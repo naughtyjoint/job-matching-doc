@@ -237,6 +237,71 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
+  /v1/user/image:
+    post:
+      tags:
+        - 會員
+      summary: 上傳會員頭像
+      operationId: updateUserImage
+      description: 可重複上傳，舊的會蓋過新的
+      requestBody:
+        description: 會員資訊
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: 圖片檔案
+              required:
+                - image
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        allOf:
+                          - $ref: '#/components/schemas/FullUser'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 會員編號
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+    delete:
+      tags:
+        - 會員
+      summary: 刪除會員頭像
+      operationId: deleteUserImage
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  
   /v1/user/recommend:
     get:
       tags:
@@ -805,7 +870,6 @@ paths:
                 res: null
       security:
         - api_key: []
-        
 
   #job
   /v1/jobs:
