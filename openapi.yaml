@@ -605,6 +605,140 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
       security:
         - api_key: []
+  /v1/user/resume/{resume_id}/files:
+    get:
+      tags:
+        - 履歷
+      summary: 取得履歷附件
+      operationId: getResumeFiles
+      parameters:
+        - $ref: '#/components/parameters/resumeIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            minimum: 0
+                            items:
+                              $ref: '#/components/schemas/ResumeFile'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: resume not found
+                res: null
+      security:
+        - api_key: []
+    post:
+      tags:
+        - 履歷
+      summary: 上傳履歷附件
+      operationId: uploadResumeFiles
+      parameters:
+        - $ref: '#/components/parameters/resumeIdParam'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 圖片檔案
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 文件檔案
+                links:
+                  type: array
+                  items:
+                    type: string
+                  description: 網站連結
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ResumeFile'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: resume not found
+                res: null
+      security:
+        - api_key: []
+  /v1/user/resume/file/{file_id}:
+    delete:
+      tags:
+        - 履歷
+      summary: 刪除履歷附件
+      operationId: deleteResumeFileById
+      parameters:
+        - name: file_id
+          in: path
+          description: 履歷附件id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: file not found
+                res: null
+      security:
+        - api_key: []
 
   #company
   /v1/company/info:
@@ -638,6 +772,7 @@ paths:
                               - contact_time
                               - others
                               - description
+                              - benefit
                               - remark
                           - $ref: '#/components/schemas/Company'
         401:
@@ -686,6 +821,7 @@ paths:
                               - contact_time
                               - others
                               - description
+                              - benefit
                               - remark
                           - $ref: '#/components/schemas/Company'
         401:
@@ -738,6 +874,7 @@ paths:
                               - contact_time
                               - others
                               - description
+                              - benefit
                               - remark
                           - $ref: '#/components/schemas/Company'
                           - $ref: '#/components/schemas/ModelTimestamp'
@@ -745,11 +882,84 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
-  /v1/company/{company_id}/images:
+  /v1/company/avatar:
+    post:
+      tags:
+        - 公司
+      summary: 上傳公司頭像
+      operationId: updateCompanyAvatar
+      description: 可重複上傳，舊的會蓋過新的
+      requestBody:
+        description: 公司資訊
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: 圖片檔案
+              required:
+                - image
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: 公司編號
+                            required:
+                              - id
+                              - avatar
+                              - fax
+                              - website
+                              - contact_time
+                              - others
+                              - description
+                              - remark
+                          - $ref: '#/components/schemas/Company'
+                          - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+    delete:
+      tags:
+        - 公司
+      summary: 刪除公司頭像
+      operationId: deleteCompanyAvatar
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/company/{company_id}/environment/images:
     get:
       tags:
         - 公司
-      summary: 取得公司圖片
+      summary: 取得公司環境圖片
       operationId: getCompanyImagesBy
       parameters:
         - $ref: '#/components/parameters/companyIdParam'
@@ -789,7 +999,7 @@ paths:
     post:
       tags:
         - 公司
-      summary: 上傳公司圖片
+      summary: 上傳公司環境圖片
       operationId: uploadCompanyImages
       parameters:
         - $ref: '#/components/parameters/companyIdParam'
@@ -834,16 +1044,16 @@ paths:
                 res: null
       security:
         - api_key: []
-  /v1/company/image/{image_id}:
+  /v1/company/environment/image/{image_id}:
     delete:
       tags:
         - 公司
-      summary: 刪除公司圖片
+      summary: 刪除指定公司環境圖片
       operationId: deleteCompanyImageById
       parameters:
         - name: image_id
           in: path
-          description: 公司圖片id
+          description: 公司環境照id
           required: true
           schema:
             type: integer
@@ -867,6 +1077,140 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
               example:
                 msg: image not found
+                res: null
+      security:
+        - api_key: []
+  /v1/company/{company_id}/attachments:
+    get:
+      tags:
+        - 公司
+      summary: 取得公司附件
+      operationId: getCompanyAttachs
+      parameters:
+        - $ref: '#/components/parameters/companyIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            minimum: 0
+                            items:
+                              $ref: '#/components/schemas/CompanyAttachment'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: company not found
+                res: null
+      security:
+        - api_key: []
+    post:
+      tags:
+        - 公司
+      summary: 上傳公司附件
+      operationId: uploadCompanyAttachs
+      parameters:
+        - $ref: '#/components/parameters/companyIdParam'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 圖片檔案
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 文件檔案
+                links:
+                  type: array
+                  items:
+                    type: string
+                  description: 網站連結
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CompanyAttachment'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: company not found
+                res: null
+      security:
+        - api_key: []
+  /v1/company/attachment/{attachment_id}:
+    delete:
+      tags:
+        - 公司
+      summary: 刪除公司附件
+      operationId: deleteCompanyAttachById
+      parameters:
+        - name: attachment_id
+          in: path
+          description: 公司附件id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: attachment not found
                 res: null
       security:
         - api_key: []
@@ -2824,18 +3168,6 @@ components:
           description: 技能
           items:
             type: string
-        attachments:
-          type: array
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                description: 名稱
-              path:
-                type: string
-                description: 路徑
-          description: 附件
       required:
         - status
         - experiences
@@ -2843,6 +3175,28 @@ components:
         - lang_skill
         - certificates
         - skills
+    ResumeFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 履歷附件id
+        file_path:
+          type: string
+          description: 附件位置
+          nullable: true
+        link:
+          type: string
+          description: 連結
+          nullable: true
+        type:
+          type: string
+          description: 附件類型(1. 圖片，2. 檔案，3. 連結)
+      required:
+        - id
+        - file_path
+        - link
+        - type
     Experience:
       type: object
       properties:
@@ -2995,6 +3349,10 @@ components:
           type: string
           description: 公司簡介
           nullable: true
+        benefit:
+          type: string
+          description: 公司福利
+          nullable: true
         remark:
           type: string
           description: 公司備註
@@ -3012,13 +3370,35 @@ components:
       properties:
         id:
           type: integer
-          description: 公司圖片id
+          description: 公司環境照id
         image_path:
           type: string
-          description: 圖片位置
+          description: 照片位置
       required:
         - id
         - image_path
+    CompanyAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 公司附件id
+        attachment_path:
+          type: string
+          description: 附件位置
+          nullable: true
+        link:
+          type: string
+          description: 連結
+          nullable: true
+        type:
+          type: string
+          description: 附件類型(1. 圖片，2. 檔案，3. 連結)
+      required:
+        - id
+        - attachment_path
+        - link
+        - type
     JobReqBody:
       type: object
       properties:
