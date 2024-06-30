@@ -656,25 +656,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                images:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
-                  description: 圖片檔案
-                files:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
-                  description: 文件檔案
-                links:
-                  type: array
-                  items:
-                    type: string
-                  description: 網站連結
+              $ref: '#/components/schemas/AttachmentsReqBody'
       responses:
         200:
           description: successful operation
@@ -1138,7 +1120,7 @@ paths:
                             type: array
                             minimum: 0
                             items:
-                              $ref: '#/components/schemas/CompanyAttachment'
+                              $ref: '#/components/schemas/Attachment'
                         required:
                           - data
         401:
@@ -1165,25 +1147,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                images:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
-                  description: 圖片檔案
-                files:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
-                  description: 文件檔案
-                links:
-                  type: array
-                  items:
-                    type: string
-                  description: 網站連結
+              $ref: '#/components/schemas/AttachmentsReqBody'
       responses:
         200:
           description: successful operation
@@ -1197,7 +1161,7 @@ paths:
                       res:
                         type: array
                         items:
-                          $ref: '#/components/schemas/CompanyAttachment'
+                          $ref: '#/components/schemas/Attachment'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         404:
@@ -1211,6 +1175,44 @@ paths:
                 res: null
       security:
         - api_key: []
+  /v1/company/attachment/{attachment_id}/name:
+    post:
+      tags:
+        - 公司
+      summary: 更新公司附件名稱
+      operationId: updateCompanyAttachName
+      parameters:
+        - $ref: '#/components/parameters/attachmentIdParam'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ImageNameReqBody'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        $ref: '#/components/schemas/Attachment'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: attachment not found
+                res: null
+      security:
+        - api_key: []
   /v1/company/attachment/{attachment_id}:
     delete:
       tags:
@@ -1218,12 +1220,7 @@ paths:
       summary: 刪除公司附件
       operationId: deleteCompanyAttachById
       parameters:
-        - name: attachment_id
-          in: path
-          description: 公司附件id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/attachmentIdParam'
       responses:
         200:
           description: successful operation
@@ -3176,6 +3173,13 @@ components:
       description: 公司id
       schema:
         type: integer
+    attachmentIdParam:
+      name: attachment_id
+      in: path
+      description: 附件id
+      required: true
+      schema:
+        type: integer
 
   responses:
     TokenUnauthenticated:
@@ -3574,12 +3578,12 @@ components:
         - id
         - image_path
         - name
-    CompanyAttachment:
+    Attachment:
       type: object
       properties:
         id:
           type: integer
-          description: 公司附件id
+          description: 附件id
         attachment_path:
           type: string
           description: 附件位置
@@ -3591,11 +3595,54 @@ components:
         type:
           type: string
           description: 附件類型(1. 圖片，2. 檔案，3. 連結)
+        name:
+          type: string
+          description: 附件名稱
+          nullable: true
       required:
         - id
         - attachment_path
         - link
         - type
+        - name
+    AttachmentsReqBody:
+      type: object
+      properties:
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+          description: 圖片檔案
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+          description: 文件檔案
+        links:
+          type: array
+          items:
+            type: string
+          description: 網站連結
+        image_names:
+          type: array
+          items:
+            type: string
+            nullable: true
+          description: 圖片名稱，對應images欄位排序
+        file_names:
+          type: array
+          items:
+            type: string
+            nullable: true
+          description: 圖片名稱，對應files欄位排序
+        link_names:
+          type: array
+          items:
+            type: string
+            nullable: true
+          description: 圖片名稱，對應links欄位排序
     JobReqBody:
       type: object
       properties:
