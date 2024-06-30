@@ -604,7 +604,7 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
       security:
         - api_key: []
-  /v1/user/resume/{resume_id}/files:
+  /v1/user/resume/{resume_id}/attachments:
     get:
       tags:
         - 履歷
@@ -629,7 +629,7 @@ paths:
                             type: array
                             minimum: 0
                             items:
-                              $ref: '#/components/schemas/ResumeFile'
+                              $ref: '#/components/schemas/Attachment'
                         required:
                           - data
         401:
@@ -670,7 +670,7 @@ paths:
                       res:
                         type: array
                         items:
-                          $ref: '#/components/schemas/ResumeFile'
+                          $ref: '#/components/schemas/Attachment'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         404:
@@ -684,19 +684,54 @@ paths:
                 res: null
       security:
         - api_key: []
-  /v1/user/resume/file/{file_id}:
+  /v1/user/resume/attachment/{attachment_id}/name:
+    post:
+      tags:
+        - 履歷
+      summary: 更新履歷附件名稱
+      operationId: updateResumeAttachName
+      parameters:
+        - $ref: '#/components/parameters/attachmentIdParam'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AttachmentsReqBody'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Attachment'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: resume not found
+                res: null
+      security:
+        - api_key: []
+  /v1/user/resume/attachment/{attachment_id}:
     delete:
       tags:
         - 履歷
       summary: 刪除履歷附件
       operationId: deleteResumeFileById
       parameters:
-        - name: file_id
-          in: path
-          description: 履歷附件id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/attachmentIdParam'
       responses:
         200:
           description: successful operation
@@ -716,7 +751,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
               example:
-                msg: file not found
+                msg: attachment not found
                 res: null
       security:
         - api_key: []
@@ -3371,28 +3406,6 @@ components:
         - lang_skill
         - certificates
         - skills
-    ResumeFile:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: 履歷附件id
-        file_path:
-          type: string
-          description: 附件位置
-          nullable: true
-        link:
-          type: string
-          description: 連結
-          nullable: true
-        type:
-          type: string
-          description: 附件類型(1. 圖片，2. 檔案，3. 連結)
-      required:
-        - id
-        - file_path
-        - link
-        - type
     Experience:
       type: object
       properties:
