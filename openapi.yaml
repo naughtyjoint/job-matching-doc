@@ -980,7 +980,7 @@ paths:
                             type: array
                             minimum: 0
                             items:
-                              $ref: '#/components/schemas/CompanyImage'
+                              $ref: '#/components/schemas/EnvImage'
                         required:
                           - data
         401:
@@ -1030,7 +1030,7 @@ paths:
                       res:
                         type: array
                         items:
-                          $ref: '#/components/schemas/CompanyImage'
+                          $ref: '#/components/schemas/EnvImage'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
         404:
@@ -1447,6 +1447,180 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
               example:
                 msg: job not found
+                res: null
+      security:
+        - api_key: []
+  /v1/job/{job_id}/environment/images:
+    get:
+      tags:
+        - 工作
+      summary: 取得工作環境圖片
+      operationId: getJobImagesById
+      parameters:
+        - $ref: '#/components/parameters/jobIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            minimum: 0
+                            items:
+                              $ref: '#/components/schemas/EnvImage'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: job not found
+                res: null
+      security:
+        - api_key: []
+    post:
+      tags:
+        - 工作
+      summary: 上傳工作環境圖片
+      operationId: uploadJobImages
+      parameters:
+        - $ref: '#/components/parameters/jobIdParam'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 圖片檔案
+                names:
+                  type: array
+                  items:
+                    type: string
+                    nullable: true
+                  description: 圖片名稱，對應images欄位排序
+              required:
+                - images
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/EnvImage'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: job not found
+                res: null
+      security:
+        - api_key: []
+  /v1/job/environment/image/{image_id}/name:
+    post:
+      tags:
+        - 工作
+      summary: 更新工作圖片名稱
+      operationId: updateJobImageName
+      parameters:
+        - name: image_id
+          in: path
+          description: 工作環境照id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ImageNameReqBody'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        $ref: '#/components/schemas/EnvImage'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: job not found
+                res: null
+      security:
+        - api_key: []
+  /v1/job/environment/image/{image_id}:
+    delete:
+      tags:
+        - 工作
+      summary: 刪除指定工作環境圖片
+      operationId: deleteJobImageById
+      parameters:
+        - name: image_id
+          in: path
+          description: 工作環境照id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 找不到資源
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: image not found
                 res: null
       security:
         - api_key: []
@@ -3365,18 +3539,23 @@ components:
         - phone
         - email
         - address
-    CompanyImage:
+    EnvImage:
       type: object
       properties:
         id:
           type: integer
-          description: 公司環境照id
+          description: 環境照id
         image_path:
           type: string
           description: 照片位置
+        name:
+          type: string
+          description: 照片名稱
+          nullable: true
       required:
         - id
         - image_path
+        - name
     CompanyAttachment:
       type: object
       properties:
@@ -3984,7 +4163,15 @@ components:
       required:
         - total
         - lastPage
-    
+    ImageNameReqBody:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 附件名稱
+      required:
+        - name
+
   securitySchemes:
     api_key:
       type: http
