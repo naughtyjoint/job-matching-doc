@@ -3270,6 +3270,9 @@ components:
           type: string
           format: date
           description: 生日
+        seniority:
+          type: integer
+          description: 總年資（0. 無工作經驗，1. 1~3年，2. 3~5年，3. 5~10年，4. 10年以上）
         marital_status:
           type: integer
           description: "婚姻狀態（0: 未婚 1: 已婚 2: 離婚 3: 喪偶）"
@@ -3345,6 +3348,7 @@ components:
         - name
         - sex
         - birthday
+        - seniority
         - marital_status
         - phone
         - special_id
