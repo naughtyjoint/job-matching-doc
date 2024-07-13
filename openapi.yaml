@@ -2648,17 +2648,19 @@ paths:
               properties:
                 task_id:
                   type: integer
+                  description: 任務ID
                 content:
                   type: string
-                img:
-                  type: string
-                  format: binary
-                video:
-                  type: string
-                  format: binary
-                audio:
-                  type: string
-                  format: binary
+                  description: 申訴內容
+                images:
+                  type: array
+                  description: 申訴圖片
+                  items:
+                    type: string
+                    format: binary
+              required:
+                - task_id
+                - content
         required: true
       responses:
         200:
@@ -2666,7 +2668,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        allOf:
+                          - $ref: '#/components/schemas/Complaint'
+                          - $ref: '#/components/schemas/ModelTimestamp'
       security:
         - api_key: []
 
@@ -4270,6 +4279,34 @@ components:
           description: 圖片名稱，對應images欄位排序
       required:
         - images
+    Complaint:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 申訴ID
+        task_id:
+          type: integer
+          description: 任務ID
+        content:
+          type: string
+          description: 申訴內容
+        img_paths:
+          type: object
+          description: 申訴圖片
+          properties:
+            data:
+              type: array
+              minimum: 1
+              items:
+                type: string
+                description: 圖片路徑
+          required:
+            - data
+      required:
+        - id
+        - task_id
+        - content
 
   securitySchemes:
     api_key:
