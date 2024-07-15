@@ -864,7 +864,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Company'
+              allOf:
+                - $ref: '#/components/schemas/Company'
+                - type: object
+                  properties:
+                    industry:
+                      type: string
+                      description: 產業代碼
       responses:
         200:
           description: successful operation
@@ -3532,8 +3538,22 @@ components:
           description: 公司頭像
           nullable: true
         industry:
-          type: string
-          description: 公司類型
+          type: object
+          description: 產業類型
+          properties:
+            code:
+              type: string
+              description: 產業代碼
+            type:
+              type: string
+              description: 產業類別
+            name:
+              type: string
+              description: 產業名稱
+          required:
+            - code
+            - type
+            - name
         members:
           type: integer
           description: 公司人數
