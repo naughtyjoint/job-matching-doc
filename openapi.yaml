@@ -3393,6 +3393,9 @@ components:
         status:
           type: integer
           description: "狀態（0：關閉，1：開啟)"
+        seniority:
+          type: integer
+          description: 總年資（0. 無工作經驗，1. 1~3年，2. 3~5年，3. 5~10年，4. 10年以上）
         experiences:
           type: array
           items:
