@@ -536,7 +536,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserResume'
+              $ref: '#/components/schemas/UserResumeReqBody'
       responses:
         200:
           description: successful operation
@@ -579,7 +579,7 @@ paths:
         content:
           application/json:
             schema:  
-              $ref: '#/components/schemas/UserResume'
+              $ref: '#/components/schemas/UserResumeReqBody'
       responses:
         200:
           description: successful operation
@@ -1426,7 +1426,7 @@ paths:
                 - type: object
                   properties:
                     detail:
-                      $ref: '#/components/schemas/JobDetail'
+                      $ref: '#/components/schemas/JobDetailReqBody'
                   required:
                     - detail
         required: true
@@ -1456,6 +1456,8 @@ paths:
                             properties:
                               detail:
                                 $ref: '#/components/schemas/JobDetail'
+                            required:
+                              - detail
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
@@ -1478,7 +1480,7 @@ paths:
                 - type: object
                   properties:
                     detail:
-                      $ref: '#/components/schemas/JobDetail'
+                      $ref: '#/components/schemas/JobDetailReqBody'
                   required:
                     - detail
         required: true
@@ -3431,7 +3433,7 @@ components:
               type: string
               format: date-time
               description: 最後登入時間
-    UserResume:
+    UserResumeReqBody:
       type: object
       properties:
         name:
@@ -3460,21 +3462,27 @@ components:
             $ref: '#/components/schemas/LangSkill'
         certificates:
           type: array
-          description: 證照列表
+          description: 證照代碼列表
           items:
-            $ref: '#/components/schemas/Certificate'
+            type: string
         skills:
           type: array
-          description: 技能
+          description: 技能工具代碼列表
           items:
             type: string
       required:
+        - name
         - status
+        - seniority
         - experiences
-        - education
-        - lang_skill
+        - educations
+        - lang_skills
         - certificates
         - skills
+    UserResume:
+      allOf:
+        - $ref: '#/components/schemas/UserResumeReqBody'
+        - $ref: '#/components/schemas/CertAndSkill'
     Experience:
       type: object
       properties:
@@ -3753,9 +3761,9 @@ components:
           description: "案件類型（0：全職, 1：兼職, 2：實習）"
         industry:
           type: array
-          description: 產業列表
+          description: 產業列表代碼
           items:
-            type: integer
+            type: string
         insurance:
           type: boolean
           description: 健保
@@ -3854,7 +3862,46 @@ components:
         - description
         - wage
         - tags
-    JobDetail:
+    Job:
+      allOf:
+        - $ref: '#/components/schemas/JobReqBody'
+        - type: object
+          properties:
+            user_id:
+              type: integer
+              description: 會員編號
+            corp_id:
+              type: integer
+              description: 公司編號
+              nullable: true
+            rating:
+              type: number
+              format: float
+              description: 評分
+            industry:
+              type: array
+              description: 產業列表
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: 產業代碼
+                  type:
+                    type: string
+                    description: 產業大分類
+                  name:
+                    type: string
+                    description: 產業分類名稱
+                required:
+                  - code
+                  - type
+                  - name
+          required:
+            - rating
+            - user_id
+            - corp_id
+    JobDetailReqBody:
       type: object
       properties:
         educations:
@@ -3874,9 +3921,9 @@ components:
               - degree
         certificates:
           type: array
-          description: 證照需求
+          description: 證照需求代碼
           items:
-            $ref: '#/components/schemas/Certificate'
+            type: string
         lang_skills:
           type: array
           description: 語言需求
@@ -3899,7 +3946,7 @@ components:
               - path
         skills:
           type: array
-          description: 技能需求
+          description: 技能需求代碼
           items:
             type: string
         other_demand:
@@ -3912,26 +3959,10 @@ components:
         - environments
         - skills
         - other_demand
-    Job:
+    JobDetail:
       allOf:
-        - type: object
-          properties:
-            user_id:
-              type: integer
-              description: 會員編號
-            corp_id:
-              type: integer
-              description: 公司編號
-              nullable: true
-            rating:
-              type: number
-              format: float
-              description: 評分
-          required:
-            - rating
-            - user_id
-            - corp_id
-        - $ref: '#/components/schemas/JobReqBody'
+        - $ref: '#/components/schemas/JobDetailReqBody'
+        - $ref: '#/components/schemas/CertAndSkill'
     Task:
       type: object
       properties:
@@ -4372,6 +4403,47 @@ components:
         - id
         - task_id
         - content
+    CertAndSkill:
+      type: object
+      properties:
+        certificates:
+          type: array
+          description: 證照列表
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                description: 證照代碼
+              type:
+                type: string
+                description: 證照分類
+              name:
+                type: string
+                description: 證照名稱
+            required:
+              - code
+              - type
+              - name
+        skills:
+          type: array
+          description: 技能工具列表
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                description: 工具代碼
+              type:
+                type: string
+                description: 工具分類
+              name:
+                type: string
+                description: 工具名稱
+            required:
+              - code
+              - type
+              - name
 
   securitySchemes:
     api_key:
