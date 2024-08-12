@@ -1758,7 +1758,8 @@ paths:
           in: query
           description: 產業類別
           schema:
-            type: integer
+            type: string
+            example: 010101, 010302
         - name: rating
           in: query
           description: 評分大於等於
