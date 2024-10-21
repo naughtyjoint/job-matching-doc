@@ -3373,7 +3373,27 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
-  
+  /v1/common/appinfo:
+    get:
+      tags:
+        - 其他
+      summary: 取得全域參數
+      operationId: getAppinfo
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: object
+                    additionalProperties:
+                      type: string
+                required:
+                  - success
+
 components:
   parameters:
     pageParam:
