@@ -385,6 +385,119 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
+  /v1/user/block/list:
+    get:
+      tags:
+        - 會員
+      summary: 取得所有會員封鎖列表
+      operationId: getUserBlockList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: array
+                        nullable: false
+                        minLength: 0
+                        items:
+                          allOf:
+                            - properties:
+                                id:
+                                  type: integer
+                                  description: 封鎖編號
+                                user_id:
+                                  type: integer
+                                  description: 會員編號（封鎖者）
+                                target_id:
+                                  type: integer
+                                  description: 被封鎖者編號
+                                type:
+                                  type: integer
+                                  description: 封鎖類型（1：會員, 2：公司）
+                              required:
+                                - id
+                                - user_id
+                                - target_id
+                                - type
+                            - $ref: '#/components/schemas/ModelTimestamp'
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/user/block/{user_id}:
+    get:
+      tags:
+        - 會員
+      summary: 封鎖會員
+      operationId: blockUser
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: boolean
+                        example: true
+        404:
+          description: 找不到會員
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: user not found
+                res: null      
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/user/unblock/{user_id}:
+    get:
+      tags:
+        - 會員
+      summary: 解除封鎖會員
+      operationId: unblockUser
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: boolean
+                        example: true
+        404:
+          description: 找不到會員
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: user not found
+                res: null      
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
 
   #resumes
   /v1/user/resumes:
@@ -972,6 +1085,83 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
               example:
                 msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/company/block/{company_id}:
+    get:
+      tags:
+        - 公司
+      summary: 封鎖公司
+      operationId: blockCompany
+      parameters:
+        - $ref: '#/components/parameters/companyIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: boolean
+                        example: true
+        403:
+          description: 錯誤操作（例封鎖自己公司）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: the operation is not allowed
+                res: null
+        404:
+          description: 找不到公司
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: company not found
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/company/unblock/{company_id}:
+    get:
+      tags:
+        - 公司
+      summary: 解除封鎖公司
+      operationId: unblockCompany
+      parameters:
+        - $ref: '#/components/parameters/companyIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: boolean
+                        example: true
+        404:
+          description: 找不到公司
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: company not found
                 res: null
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
