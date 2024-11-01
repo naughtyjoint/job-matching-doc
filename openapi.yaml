@@ -3673,12 +3673,12 @@ components:
             $ref: '#/components/schemas/LangSkill'
         certificates:
           type: array
-          description: 證照代碼列表
+          description: 證照代碼列表，自定義直接填入文字
           items:
             type: string
         skills:
           type: array
-          description: 技能工具代碼列表
+          description: 技能工具代碼列表，自定義直接填入文字
           items:
             type: string
       required:
@@ -3972,7 +3972,7 @@ components:
           description: "案件類型（0：全職, 1：兼職, 2：實習）"
         industry:
           type: array
-          description: 產業列表代碼
+          description: 產業列表代碼，自定義直接填入文字
           items:
             type: string
         insurance:
@@ -4098,9 +4098,11 @@ components:
                   code:
                     type: string
                     description: 產業代碼
+                    nullable: true
                   type:
                     type: string
                     description: 產業大分類
+                    nullable: true
                   name:
                     type: string
                     description: 產業分類名稱
@@ -4132,7 +4134,7 @@ components:
               - degree
         certificates:
           type: array
-          description: 證照需求代碼
+          description: 證照需求代碼，自定義直接填入文字
           items:
             type: string
         lang_skills:
@@ -4157,7 +4159,7 @@ components:
               - path
         skills:
           type: array
-          description: 技能需求代碼
+          description: 技能需求代碼，自定義直接填入文字
           items:
             type: string
         other_demand:
@@ -4626,9 +4628,11 @@ components:
               code:
                 type: string
                 description: 證照代碼
+                nullable: true
               type:
                 type: string
                 description: 證照分類
+                nullable: true
               name:
                 type: string
                 description: 證照名稱
@@ -4645,9 +4649,11 @@ components:
               code:
                 type: string
                 description: 工具代碼
+                nullable: true
               type:
                 type: string
                 description: 工具分類
+                nullable: true
               name:
                 type: string
                 description: 工具名稱
