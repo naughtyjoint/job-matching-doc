@@ -15,6 +15,7 @@ tags:
   - name: 評論
   - name: 申訴
   - name: 訊息
+  - name: 雇主後台
   - name: 其他
 paths:
   #user
@@ -3128,6 +3129,364 @@ paths:
       security:
         - api_key: []
 
+  #manage
+  /v1/manage/employee/{user_id}/tasks/info/{year}/{month}:
+    get:
+      tags:
+        - 雇主後台
+      summary: 取得單一員工單月出勤資訊
+      description: 透過員工會員編號取得指定月份出勤資訊
+      operationId: getEmployeeMonthTasks
+      parameters:
+        - $ref: "#/components/parameters/userIdParam"
+        - $ref: "#/components/parameters/yearParam"
+        - $ref: "#/components/parameters/monthParam"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          work_hours:
+                            type: integer
+                            minimum: 0
+                            description: 上班時數
+                          over_time:
+                            type: integer
+                            minimum: 0
+                            description: 加班時數
+                          tasks:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/FullTask'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - work_hours
+                          - over_time
+                          - tasks
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/manage/employee/{user_id}/salary/{year}/{month}:
+    get:
+      tags:
+        - 雇主後台
+      summary: 取得單一員工單月總薪資資訊
+      description: 透過員工會員編號取得指定月份薪資資訊
+      operationId: getEmployeeMonthSalary
+      parameters:
+        - $ref: "#/components/parameters/userIdParam"
+        - $ref: "#/components/parameters/yearParam"
+        - $ref: "#/components/parameters/monthParam"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          year:
+                            type: string
+                            description: 年份
+                          month:
+                            type: string
+                            description: 月份
+                          total_pay:
+                            type: integer
+                            description: 總本薪
+                          total_ot_pay:
+                            type: integer
+                            description: 總加班費
+                          total_sum_pay:
+                            type: integer
+                            description: 總薪資
+                          pf_attendance:
+                            type: integer
+                            description: 全勤獎金
+                          bonus:
+                            type: integer
+                            description: 其他獎金
+                        required:
+                          - year
+                          - month
+                          - total_pay
+                          - total_ot_pay
+                          - total_sum_pay
+                          - pf_attendance
+                          - bonus
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/manage/employee/{user_id}/salary/update:
+    post:
+      tags:
+        - 雇主後台
+      summary: 更新單一員工單月總薪資資訊
+      description: 透過員工會員編號更新指定月份薪資資訊
+      operationId: updateEmployeeMonthSalary
+      parameters:
+        - $ref: "#/components/parameters/userIdParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                year:
+                  type: string
+                  description: 年份
+                month:
+                  type: string
+                  description: 月份
+                total_pay:
+                  type: integer
+                  description: 總本薪
+                total_ot_pay:
+                  type: integer
+                  description: 總加班費
+                total_sum_pay:
+                  type: integer
+                  description: 總薪資
+                pf_attendance:
+                  type: integer
+                  description: 全勤獎金
+                bonus:
+                  type: integer
+                  description: 其他獎金
+              required:
+                - year
+                - month
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          year:
+                            type: string
+                            description: 年份
+                          month:
+                            type: string
+                            description: 月份
+                          total_pay:
+                            type: integer
+                            description: 總本薪
+                          total_ot_pay:
+                            type: integer
+                            description: 總加班費
+                          total_sum_pay:
+                            type: integer
+                            description: 總薪資
+                          pf_attendance:
+                            type: integer
+                            description: 全勤獎金
+                          bonus:
+                            type: integer
+                            description: 其他獎金
+                        required:
+                          - year
+                          - month
+                          - total_pay
+                          - total_ot_pay
+                          - total_sum_pay
+                          - pf_attendance
+                          - bonus
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/manage/employees/tasks/info/{year}/{month}:
+    get:
+      tags:
+        - 雇主後台
+      summary: 取得所有員工單月出勤資訊
+      operationId: getEmployeesMonthTasks
+      parameters:
+        - $ref: "#/components/parameters/yearParam"
+        - $ref: "#/components/parameters/monthParam"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        description: '日期，ex: "2024-11-10"'
+                        additionalProperties:
+                          type: array
+                          description: 該日所有出缺勤資訊
+                          items:
+                            allOf:
+                              - $ref: '#/components/schemas/FullTask'
+                              - $ref: '#/components/schemas/ModelTimestamp'
+                              - type: object
+                                properties:
+                                  user_name:
+                                    type:  string
+                                    description: 員工姓名
+                                required:
+                                  - user_name
+
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/manage/employees:
+    get:
+      tags:
+        - 雇主後台
+      summary: 取得所有員工資訊
+      operationId: getEmployees
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: array
+                        items:
+                          type: object
+                          description: 員工資訊
+                          properties:
+                            user_id:
+                              type: integer
+                              description: 會員id
+                              example: 1
+                            user_name:
+                              type: string
+                              description: 員工姓名
+                              example: 李小米
+                            monthly_salary_sum:
+                              type: integer
+                              description: 本月薪資
+                              example: 10000
+                            monthly_ot_sum:
+                              type: integer
+                              description: 加班時數
+                              example: 5
+                            latest_start_at:
+                              type: string
+                              format: date
+                              description: 最新任務上班時間
+                              example: '2024-05-05 10:00:00'
+                            latest_end_at:
+                              type: string
+                              format: date
+                              description: 最新任務下班時間
+                              example: '2024-05-05 18:00:00'
+                          required:
+                            - user_id
+                            - user_name
+                            - monthly_salary_sum
+                            - monthly_ot_sum
+                            - latest_start_at
+                            - latest_end_at
+        401:
+            $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/manage/salary/info:
+    get:
+      tags:
+        - 雇主後台
+      summary: 所有員工總月薪資資訊
+      operationId: getAllSalary
+      parameters:
+        - name: start_at
+          in: query
+          description: 起始月份
+          schema:
+            type: string
+            format: date
+            example: '2024-01-01'
+        - name: end_at
+          in: query
+          description: 結束月份
+          schema:
+            type: string
+            format: date
+            example: '2024-05-01'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: array
+                        items:
+                          type: object
+                          description: 當月薪資資訊
+                          properties:
+                            month:
+                              type: integer
+                              description: 月份
+                              example: 1
+                            year:
+                              type: integer
+                              description: 年份
+                              example: 2024
+                            total_sum_pay:
+                              type: integer
+                              description: 總薪資
+                              example: 22212
+                            total_pay:
+                              type: integer
+                              description: 總本資
+                              example: 18600
+                            total_ot_pay:
+                              type: integer
+                              description: 總加班費
+                              example: 3612
+                          required:
+                            - month
+                            - year
+                            - total_sum_pay
+                            - total_pay
+                            - total_ot_pay
+        401:
+            $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+
   #common
   /v1/common/industries:
     get:
@@ -3487,6 +3846,20 @@ components:
       name: attachment_id
       in: path
       description: 附件id
+      required: true
+      schema:
+        type: integer
+    yearParam:
+      name: year
+      in: path
+      description: 年份
+      required: true
+      schema:
+        type: integer
+    monthParam:
+      name: month
+      in: path
+      description: 月份
       required: true
       schema:
         type: integer
