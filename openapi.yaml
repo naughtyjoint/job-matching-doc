@@ -19,6 +19,30 @@ tags:
   - name: 其他
 paths:
   #user
+  /v1/sso/login:
+    get:
+      tags:
+        - 會員
+      summary: 第三方會員登入
+      description: 第三方會員登入取得token
+      operationId: ssoUserLogin
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                        required:
+                          - token
   /v1/user/login:
     post:
       tags:
