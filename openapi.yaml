@@ -5030,7 +5030,7 @@ components:
       properties:
         event_type:
           type: integer
-          description: 訊息類別(0：聊天訊息，1：案件(任務)，2：應徵職缺，3：邀約職缺，4：面試邀請，5：收取費用，6：系統文字訊息)
+          description: 訊息類別(0：聊天訊息，1：案件(任務)，2：應徵職缺，3：邀約職缺，4：面試邀請，5：收取費用，6：系統文字訊息，7：發送履歷)
         event_id:
           type: integer
           description: 對應物件Id
