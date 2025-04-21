@@ -4766,7 +4766,7 @@ components:
               description: 任務編號
             status:
               type: integer
-              description: '任務狀態 0: 等待答覆, 1: 拒絕邀約, 2: 已接受, 3: 已完成'
+              description: '任務狀態 0: 等待答覆, 1: 拒絕邀約, 2: 已接受, 3: 已完成, 4: 已過期（未簽約）'
             fee:
               type: integer
               description: '任務結算狀態 0: 未收取, 1: 已收取/結清'
@@ -5079,7 +5079,7 @@ components:
       properties:
         event_type:
           type: integer
-          description: 訊息類別(0：聊天訊息，1：案件(任務)，2：應徵職缺，3：邀約職缺，4：面試邀請，5：收取費用，6：預先打卡，7：上班打卡，8：下班打卡，9：結帳通知，10：補打卡，11：已結清費用，12：發送履歷，100：系統文字訊息)
+          description: 訊息類別(0：聊天訊息，1：案件(任務)，2：應徵職缺，3：邀約職缺，4：面試邀請，5：收取費用，6：預先打卡，7：上班打卡，8：下班打卡，9：結帳通知，10：補打卡，11：已結清費用，12：發送履歷，13：簽約過期通知，100：系統文字訊息)
         event_id:
           type: integer
           description: 對應物件Id
