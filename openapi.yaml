@@ -524,6 +524,108 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
+  /v1/user/collections:
+    get:
+      tags:
+        - 會員
+      summary: 取得人才收藏列表
+      operationId: getUserCollectionslist
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 會員編號
+                                  required:
+                                    - id
+                                - $ref: "#/components/schemas/FullUser"
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/user/collection:
+    post:
+      tags:
+        - 會員
+      summary: 新增人才收藏
+      operationId: addUserCollection
+      requestBody:
+        description: 會員ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+              required:
+                - user_id
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關會員
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: user not found
+                res: null
+      security:
+        - api_key: []
+  /v1/user/collection/{user_id}:
+    delete:
+      tags:
+        - 會員
+      summary: 刪除人才收藏
+      operationId: deleteUserCollection
+      parameters:
+        - $ref: '#/components/parameters/userIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: boolean
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
 
   #resumes
   /v1/user/resumes:
@@ -1786,6 +1888,109 @@ paths:
               example:
                 msg: job not found
                 res: null
+      security:
+        - api_key: []
+  /v1/job/collections:
+    get:
+      tags:
+        - 工作
+      summary: 取得會員收藏工作列表
+      operationId: getJobCollectionslist
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      description: 工作案件編號
+                                  required:
+                                    - id
+                                - $ref: "#/components/schemas/Job"
+                                - $ref: "#/components/schemas/ModelTimestamp"
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/job/collection:
+    post:
+      tags:
+        - 工作
+      summary: 新增工作收藏
+      operationId: addJobCollection
+      requestBody:
+        description: 工作ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_id:
+                  type: integer
+              required:
+                - job_id
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: success
+                res: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關工作
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: job not found
+                res: null
+      security:
+        - api_key: []
+  /v1/job/collection/{job_id}:
+    delete:
+      tags:
+        - 工作
+      summary: 刪除工作收藏
+      operationId: deleteJobCollection
+      parameters:
+        - $ref: '#/components/parameters/jobIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: boolean
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
   /v1/job/{job_id}/environment/images:
@@ -4547,7 +4752,7 @@ components:
         address:
           type: string
           description: 案件所在地址
-        country:
+        county:
           type: integer
           description: 縣市代碼
         district:
