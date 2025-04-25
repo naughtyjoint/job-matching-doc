@@ -2979,6 +2979,46 @@ paths:
                 res: null
       security:
         - api_key: []
+  /v1/task/contract/sign/{task_id}:
+    get:
+      tags:
+        - 任務
+      summary: 簽署合約書
+      description: 簽署指定任務合約書，完成後自動生成相關工作任務排程
+      operationId: taskContractSign
+      parameters:
+        - $ref: "#/components/parameters/taskIdParam"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          contract_sign:
+                            type: integer
+                            description: '簽約後狀態 1: 雇主已簽, 2: 勞工已簽, 3: 已完成'
+                        required:
+                          - contract_sign
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        404:
+          description: 無相關任務資料
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: task not found
+                res: null
+      security:
+        - api_key: []
 
   #comment
   /v1/comments:
