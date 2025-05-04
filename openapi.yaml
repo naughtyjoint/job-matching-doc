@@ -1713,10 +1713,14 @@ paths:
                                 type: integer
                                 description: 公司編號
                                 nullable: true
+                              lock:
+                                type: integer
+                                description: 編輯鎖定狀態(0：可編輯，1：已鎖定)
                             required:
                               - id
                               - user_id
                               - corp_id
+                              - lock
                           - $ref: '#/components/schemas/Job'
                           - type: object
                             properties:
