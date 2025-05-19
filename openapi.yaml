@@ -380,6 +380,8 @@ paths:
         - $ref: '#/components/parameters/keywordParam'
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/countyParam'
+        - $ref: '#/components/parameters/districtParam'
       responses:
         200:
           description: successful operation
@@ -4356,6 +4358,20 @@ components:
       required: true
       schema:
         type: integer
+    countyParam:
+      name: county
+      in: query
+      description: 縣市代碼
+      schema:
+        type: string
+        example: "01"
+    districtParam:
+      name: county
+      in: query
+      description: 行政區代碼
+      schema:
+        type: string
+        example: "0101"
 
   responses:
     TokenUnauthenticated:
