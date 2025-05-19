@@ -3281,6 +3281,12 @@ paths:
                                 user_id:
                                   type: integer
                                   description: 對方user id
+                                latest_message:
+                                  type: string
+                                  description: 最後訊息
+                                unread_count:
+                                  type: integer
+                                  description: 未讀筆數
                                 created_at:
                                   type: string
                                   description: 聊天室創建時間
@@ -3292,6 +3298,8 @@ paths:
                               required:
                                 - id
                                 - user_id
+                                - latest_message
+                                - unread_count
                                 - created_at
                                 - updated_at
                         required:
@@ -3426,6 +3434,42 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
               example:
                 msg: user not found
+                res: null
+      security:
+        - api_key: []
+  /v1/chat/message/recall/{messagse_id}:
+    get:
+      tags:
+        - 訊息
+      summary: 收回訊息紀錄
+      operationId: recallMessageByMsgId
+      parameters:
+        - $ref: '#/components/parameters/messageIdParam'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        example: null
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+        403:
+          $ref: '#/components/responses/PermissionDenied'
+        404:
+          description: 找不到訊息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: message not found
                 res: null
       security:
         - api_key: []
@@ -4255,6 +4299,13 @@ components:
       name: room_id
       in: path
       description: 訊息room id
+      required: true
+      schema:
+        type: integer
+    messageIdParam:
+      name: message_id
+      in: path
+      description: 訊息id
       required: true
       schema:
         type: integer
@@ -5328,10 +5379,18 @@ components:
             chat_room_id:
               type: integer
               description: 訊息Room Id
+            is_read:
+              type: boolean
+              description: 已讀未讀
+            is_recalled:
+              type: boolean
+              description: 訊息使否收回
           required:
             - id
             - user_id
             - chat_room_id
+            - is_read
+            - is_recalled
         - $ref: '#/components/schemas/RequestChatMsg'
     RequestChatMsg:
       type: object
