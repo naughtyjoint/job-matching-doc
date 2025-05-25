@@ -15,6 +15,7 @@ tags:
   - name: 評論
   - name: 申訴
   - name: 訊息
+  - name: 瀏覽記錄
   - name: 雇主後台
   - name: 其他
   - name: 開放串接資料（內部使用）
@@ -181,6 +182,11 @@ paths:
       operationId: getUserInfoById
       parameters:
         - $ref: '#/components/parameters/userIdParam'
+        - name: visit
+          in: query
+          description: 訪問行為，帶 true
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -1691,6 +1697,11 @@ paths:
       operationId: getJobInfo
       parameters:
         - $ref: '#/components/parameters/jobIdParam'
+        - name: visit
+          in: query
+          description: 訪問行為，帶 true
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -3504,6 +3515,70 @@ paths:
       security:
         - api_key: []
 
+  #history
+  /v1/user/visit/histories:
+    get:
+      tags:
+        - 瀏覽記錄
+      summary: 查看勞工頁面瀏覽記錄
+      operationId: userVisitHistoriesList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/VisitHistory'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/job/visit/histories:
+    get:
+      tags:
+        - 瀏覽記錄
+      summary: 查看職缺頁面瀏覽記錄
+      operationId: jobVisitHistoriesList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              allOf:
+                                - $ref: '#/components/schemas/VisitHistory'
+                                - $ref: '#/components/schemas/ModelTimestamp'
+                        required:
+                          - data
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  
   #manage
   /v1/manage/employee/{user_id}/tasks/info/{year}/{month}:
     get:
@@ -5555,6 +5630,40 @@ components:
               - code
               - type
               - name
+    VisitHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 紀錄ID
+        user_id:
+          type: integer
+          description: 會員ID
+        employee_id:
+          type: string
+          description: 勞工ID
+        job_id:
+          type: string
+          description: 職缺ID
+        data:
+          type: object
+          description: 紀錄細節
+          properties:
+            id:
+              type: integer
+              description: 相關物件ID
+            name:
+              type: string
+              description: 相關物件名稱
+          required:
+            - id
+            - name
+      required:
+        - id
+        - user_id
+        - employee_id
+        - job_id
+        - data
 
   securitySchemes:
     api_key:
