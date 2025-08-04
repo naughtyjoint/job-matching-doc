@@ -2221,6 +2221,12 @@ paths:
         - $ref: '#/components/parameters/keywordParam'
         - $ref: '#/components/parameters/pageParam'
         - $ref: '#/components/parameters/limitParam'
+        - name: overdue
+          in: query
+          description: 是否過期（預設為0）
+          schema:
+            type: integer
+            enum: [0, 1]
         - name: area
           in: query
           description: 區域
@@ -2391,6 +2397,15 @@ paths:
                           - $ref: '#/components/schemas/ModelTimestamp'
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
+        403:
+          description: 工作已額滿
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: 'recruitment full'
+                res: null
       security:
         - api_key: []
   /v1/recruitment/update/{recruitment_id}:
@@ -2739,6 +2754,15 @@ paths:
                           - data
         401:
           $ref: '#/components/responses/TokenUnauthenticated'
+        403:
+          description: 工作已額滿
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                msg: 'recruitment full'
+                res: null
       security:
         - api_key: []
   /v1/task/{task_id}/update:
