@@ -3520,7 +3520,6 @@ paths:
                 res: null
       security:
         - api_key: []
-  
   /v1/chat/message/recall/{messagse_id}:
     get:
       tags:
@@ -3557,6 +3556,51 @@ paths:
                 res: null
       security:
         - api_key: []
+  /v1/chat/messages/read:
+    post:
+      tags:
+        - 訊息
+      summary: 已讀訊息
+      operationId: readMessages
+      description: 批次更改訊息物件狀態為已讀
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  minimum: 1
+                  items:
+                    type: integer
+                    description: 訊息id
+              required:
+                - ids
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        nullable: false
+                        properties:
+                          updated_count:
+                            type: integer
+                            description: 已讀訊息數量
+                        required:
+                          - updated_count
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+
   /v1/chat/broadcasting/auth:
     post:
       tags:
