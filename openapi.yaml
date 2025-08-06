@@ -2260,6 +2260,19 @@ paths:
             type: integer
             minimum: 1
             maximum: 5
+        - name: sort_by
+          in: query
+          description: 排序欄位（rating=評價、salary=薪水、date=日期）
+          schema:
+            type: string
+            enum: [rating, salary, date]
+        - name: sort_order
+          in: query
+          description: 排序方向（預設為desc降序）
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
       responses:
         200:
           description: successful operation
