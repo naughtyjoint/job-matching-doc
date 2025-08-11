@@ -2272,10 +2272,10 @@ paths:
             type: string
         - name: sort_by
           in: query
-          description: 排序欄位（rating=評價、salary=薪水、date=日期）
+          description: 排序欄位（rating=評價、salary=薪水、date=日期、location=地點）
           schema:
             type: string
-            enum: [rating, salary, date]
+            enum: [rating, salary, date, location]
         - name: sort_order
           in: query
           description: 排序方向（預設為desc降序）
