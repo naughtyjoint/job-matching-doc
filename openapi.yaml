@@ -2265,6 +2265,11 @@ paths:
             type: integer
             minimum: 1
             maximum: 5
+        - name: tag
+          in: query
+          description: 標籤篩選
+          schema:
+            type: string
         - name: sort_by
           in: query
           description: 排序欄位（rating=評價、salary=薪水、date=日期）
