@@ -1731,6 +1731,9 @@ paths:
                               lock:
                                 type: integer
                                 description: 編輯鎖定狀態(0：可編輯，1：已鎖定)
+                              approach:
+                                type: integer
+                                description: 接洽狀態(0：開放應徵，1：接洽中)
                             required:
                               - id
                               - user_id
