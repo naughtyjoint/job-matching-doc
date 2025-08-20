@@ -3965,44 +3965,56 @@ paths:
                   - type: object
                     properties:
                       res:
-                        type: array
-                        items:
-                          type: object
-                          description: 員工資訊
-                          properties:
-                            user_id:
-                              type: integer
-                              description: 會員id
-                              example: 1
-                            user_name:
-                              type: string
-                              description: 員工姓名
-                              example: 李小米
-                            monthly_salary_sum:
-                              type: integer
-                              description: 本月薪資
-                              example: 10000
-                            monthly_ot_sum:
-                              type: integer
-                              description: 加班時數
-                              example: 5
-                            latest_start_at:
-                              type: string
-                              format: date
-                              description: 最新任務上班時間
-                              example: '2024-05-05 10:00:00'
-                            latest_end_at:
-                              type: string
-                              format: date
-                              description: 最新任務下班時間
-                              example: '2024-05-05 18:00:00'
-                          required:
-                            - user_id
-                            - user_name
-                            - monthly_salary_sum
-                            - monthly_ot_sum
-                            - latest_start_at
-                            - latest_end_at
+                        allOf:
+                          - $ref: '#/components/schemas/PageResponse'
+                          - type: object
+                            properties:
+                              data:
+                                type: array
+                                items:
+                                  type: object
+                                  description: 員工資訊
+                                  properties:
+                                    user_id:
+                                      type: integer
+                                      description: 會員id
+                                      example: 1
+                                    user_name:
+                                      type: string
+                                      description: 員工姓名
+                                      example: 李小米
+                                    mug_shot_img:
+                                      type: string
+                                      format: uri
+                                      description: 頭貼網址
+                                    monthly_salary_sum:
+                                      type: integer
+                                      description: 本月薪資
+                                      example: 10000
+                                    monthly_ot_sum:
+                                      type: integer
+                                      description: 加班時數
+                                      example: 5
+                                    latest_start_at:
+                                      type: string
+                                      format: date
+                                      description: 最新任務上班時間
+                                      example: '2024-05-05 10:00:00'
+                                    latest_end_at:
+                                      type: string
+                                      format: date
+                                      description: 最新任務下班時間
+                                      example: '2024-05-05 18:00:00'
+                                  required:
+                                    - user_id
+                                    - user_name
+                                    - mug_shot_img
+                                    - monthly_salary_sum
+                                    - monthly_ot_sum
+                                    - latest_start_at
+                                    - latest_end_at
+                            required:
+                              - data
         401:
             $ref: '#/components/responses/TokenUnauthenticated'
       security:
