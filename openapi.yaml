@@ -3954,6 +3954,13 @@ paths:
         - 雇主後台
       summary: 取得所有員工資訊
       operationId: getEmployees
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - name: limit
+          in: query
+          description: 單頁筆數(預設為12)
+          schema:
+            type: integer
       responses:
         200:
           description: successful operation
