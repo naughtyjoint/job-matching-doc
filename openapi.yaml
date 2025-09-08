@@ -4339,6 +4339,128 @@ paths:
           $ref: '#/components/responses/TokenUnauthenticated'
       security:
         - api_key: []
+  /v1/common/positions:
+    get:
+      tags:
+        - 其他
+      summary: 查看職務類別清單
+      operationId: positionsList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        description: 主類別編碼群組（此為範例數字）
+                        properties:
+                          100000:
+                            type: object
+                            description: 副類別編碼群組（此為範例數字）
+                            properties:
+                              000100:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      description: 主類別編碼
+                                      example: 100000
+                                    min_code:
+                                      type: string
+                                      description: 副類別編碼
+                                      example: 000100
+                                    sub_code:
+                                      type: string
+                                      description: 子類別編碼
+                                      example: 100101
+                                    maj_name:
+                                      type: string
+                                      description: 主類別名稱
+                                    min_name:
+                                      type: string
+                                      description: 副類別名稱
+                                    pos_name:
+                                      type: string
+                                      description: 子類別名稱
+                                  required:
+                                    - code
+                                    - min_code
+                                    - sub_code
+                                    - maj_name
+                                    - min_name
+                                    - pos_name
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
+  /v1/common/departments:
+    get:
+      tags:
+        - 其他
+      summary: 查看科系類別清單
+      operationId: departmentsList
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      res:
+                        type: object
+                        description: 主類別編碼群組（此為範例數字）
+                        properties:
+                          100000:
+                            type: object
+                            description: 副類別編碼群組（此為範例數字）
+                            properties:
+                              000100:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      description: 主類別編碼
+                                      example: 100000
+                                    min_code:
+                                      type: string
+                                      description: 副類別編碼
+                                      example: 000100
+                                    sub_code:
+                                      type: string
+                                      description: 子類別編碼
+                                      example: 100101
+                                    maj_name:
+                                      type: string
+                                      description: 主類別名稱
+                                    min_name:
+                                      type: string
+                                      description: 副類別名稱
+                                    depart_name:
+                                      type: string
+                                      description: 子類別名稱
+                                  required:
+                                    - code
+                                    - min_code
+                                    - sub_code
+                                    - maj_name
+                                    - min_name
+                                    - depart_name
+        401:
+          $ref: '#/components/responses/TokenUnauthenticated'
+      security:
+        - api_key: []
   /v1/common/appinfo:
     get:
       tags:
