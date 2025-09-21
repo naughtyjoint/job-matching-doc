@@ -118,8 +118,13 @@ paths:
                       type: string
                       format: password
                       description: 登入密碼
+                    password_confirmation:
+                      type: string
+                      format: password
+                      description: 確認密碼
                   required:
                     - password
+                    - password_confirmation
         required: true
       responses:
         200:
