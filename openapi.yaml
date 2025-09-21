@@ -415,6 +415,18 @@ paths:
                                           type: integer
                                           description: 會員編號
                                     - $ref: '#/components/schemas/FullUser'
+                                    - type: object
+                                      properties:
+                                        rating:
+                                          type: number
+                                          format: float
+                                          description: 會員評分
+                                        case_count:
+                                          type: integer
+                                          description: 會員接案數
+                                      required:
+                                        - rating
+                                        - case_count
                             required:
                               - data
         401:
@@ -4899,6 +4911,13 @@ components:
               type: string
               format: date-time
               description: 最後登入時間
+            sso_user:
+              type: integer
+              description: 是否為SSO會員
+          required:
+            - last_login
+            - sso_user
+        - $ref: '#/components/schemas/ModelTimestamp'
     UserResumeReqBody:
       type: object
       properties:
